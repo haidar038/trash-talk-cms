@@ -1,9 +1,27 @@
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
-import { Recycle, BookOpen, Leaf, ArrowRight } from "lucide-react";
+import { Recycle, BookOpen, Leaf, ArrowRight, Calendar } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { format } from "date-fns";
 
 const Index = () => {
   const navigate = useNavigate();
+
+  const { data: featuredArticles } = useQuery({
+    queryKey: ["featured-articles"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("articles")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(3);
+
+      if (error) throw error;
+      return data;
+    },
+  });
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-secondary/30 to-accent/20">
@@ -30,6 +48,14 @@ const Index = () => {
             >
               Get Started
               <ArrowRight className="w-5 h-5" />
+            </Button>
+            <Button 
+              size="lg" 
+              variant="outline"
+              onClick={() => navigate("/articles")}
+              className="gap-2 text-lg px-8 py-6"
+            >
+              Browse Articles
             </Button>
           </div>
 
@@ -58,6 +84,46 @@ const Index = () => {
               </p>
             </div>
           </div>
+
+          {featuredArticles && featuredArticles.length > 0 && (
+            <div className="mt-16">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-3xl font-bold">Featured Articles</h2>
+                <Button variant="ghost" onClick={() => navigate("/articles")}>
+                  View All <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </div>
+              <div className="grid md:grid-cols-3 gap-6">
+                {featuredArticles.map((article) => (
+                  <Card
+                    key={article.id}
+                    className="cursor-pointer hover:shadow-lg transition-shadow"
+                    onClick={() => navigate(`/article/${article.id}`)}
+                  >
+                    {article.image_url && (
+                      <img
+                        src={article.image_url}
+                        alt={article.title}
+                        className="w-full h-48 object-cover rounded-t-lg"
+                      />
+                    )}
+                    <CardHeader>
+                      <CardTitle className="line-clamp-2">{article.title}</CardTitle>
+                      <CardDescription className="flex items-center gap-1 text-xs">
+                        <Calendar className="h-3 w-3" />
+                        {format(new Date(article.created_at), "MMM dd, yyyy")}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm text-muted-foreground line-clamp-3">
+                        {article.content}
+                      </p>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

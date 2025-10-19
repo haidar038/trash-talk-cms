@@ -2,10 +2,11 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { User } from "@supabase/supabase-js";
-import { Loader2, Plus, LogOut, Recycle, Edit, Trash2 } from "lucide-react";
+import { Loader2, Plus, LogOut, Recycle, Edit, Trash2, Search } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -28,6 +29,7 @@ interface Article {
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState("");
   const [user, setUser] = useState<User | null>(null);
   const [articles, setArticles] = useState<Article[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -132,18 +134,32 @@ const Dashboard = () => {
       <main className="container mx-auto px-4 py-8">
         <div className="mb-8">
           <h2 className="text-3xl font-bold mb-2">Your Articles</h2>
-          <p className="text-muted-foreground">
+          <p className="text-muted-foreground mb-4">
             Manage your waste management content
           </p>
+          <div className="relative max-w-md">
+            <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search your articles..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10"
+            />
+          </div>
         </div>
 
-        {articles.length === 0 ? (
+        {articles.filter(
+          (article) =>
+            article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            article.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            article.category.toLowerCase().includes(searchQuery.toLowerCase())
+        ).length === 0 ? (
           <Card className="text-center py-12">
             <CardContent>
               <Recycle className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-              <CardTitle className="mb-2">No articles yet</CardTitle>
+              <CardTitle className="mb-2">No articles found</CardTitle>
               <CardDescription className="mb-4">
-                Create your first article to get started
+                {searchQuery ? "No articles match your search." : "Create your first article to get started"}
               </CardDescription>
               <Button onClick={() => navigate("/create")}>
                 <Plus className="w-4 h-4 mr-2" />
@@ -153,7 +169,12 @@ const Dashboard = () => {
           </Card>
         ) : (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {articles.map((article) => (
+            {articles.filter(
+              (article) =>
+                article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                article.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                article.category.toLowerCase().includes(searchQuery.toLowerCase())
+            ).map((article) => (
               <Card key={article.id} className="hover:shadow-lg transition-shadow">
                 <CardHeader>
                   <div className="flex items-start justify-between gap-2">
