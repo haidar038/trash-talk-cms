@@ -70,7 +70,7 @@ const Index = () => {
                         <div className="mt-16">
                             <div className="flex justify-between items-center mb-6">
                                 <h2 className="text-xl lg:text-3xl font-bold">Artikel Unggulan</h2>
-                                <Button variant="ghost" onClick={() => navigate("/articles")}>
+                                <Button variant="outline" onClick={() => navigate("/articles")}>
                                     Lihat Semua <ArrowRight className="ml-2 h-4 w-4" />
                                 </Button>
                             </div>
@@ -79,7 +79,7 @@ const Index = () => {
                                     <Card key={article.id} className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => navigate(`/article/${article.id}`)}>
                                         {article.image_url && <img src={article.image_url} alt={article.title} className="w-full h-48 object-cover rounded-t-lg" />}
                                         <CardHeader>
-                                            <CardTitle className="line-clamp-2 mb-1">{article.title}</CardTitle>
+                                            <CardTitle className="line-clamp-2 text-start text-lg mb-1">{article.title}</CardTitle>
                                             <CardDescription className="flex items-center justify-between gap-1 text-xs">
                                                 <div className="flex items-center gap-1">
                                                     <Calendar className="h-3 w-3" />
