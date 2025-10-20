@@ -89,11 +89,11 @@ const Navbar = () => {
                                             Dashboard
                                         </DropdownMenuItem>
                                     )}
-                                    <DropdownMenuItem onClick={() => navigate("/profile")}>
+                                    <DropdownMenuItem onClick={() => navigate("/classification")}>
                                         <Search className="w-4 h-4 mr-2" />
                                         Identifikasi
                                     </DropdownMenuItem>
-                                    <DropdownMenuItem onClick={() => navigate("/profile")}>
+                                    <DropdownMenuItem onClick={() => navigate("/articles")}>
                                         <BookOpen className="w-4 h-4 mr-2" />
                                         Edukasi
                                     </DropdownMenuItem>

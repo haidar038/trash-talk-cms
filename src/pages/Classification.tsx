@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Loader2, Upload, ImageIcon, AlertCircle, Camera, X } from "lucide-react";
+import { Loader2, Upload, ImageIcon, AlertCircle, Camera, X, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { Pie } from "react-chartjs-2";
@@ -35,6 +35,8 @@ const Classification = () => {
     const [results, setResults] = useState<AnalysisResult | null>(null);
     const [stream, setStream] = useState<MediaStream | null>(null);
     const [isCameraActive, setIsCameraActive] = useState(false);
+    const [isFlashlightOn, setIsFlashlightOn] = useState(false);
+    const [isFlashlightSupported, setIsFlashlightSupported] = useState(false);
     const videoRef = useRef<HTMLVideoElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -49,6 +51,12 @@ const Classification = () => {
     useEffect(() => {
         if (stream && videoRef.current) {
             videoRef.current.srcObject = stream;
+
+            const track = stream.getVideoTracks()[0];
+            if (track) {
+                const capabilities = track.getCapabilities();
+                setIsFlashlightSupported(!!capabilities.torch);
+            }
         }
     }, [stream]);
 
@@ -76,8 +84,25 @@ const Classification = () => {
             stream.getTracks().forEach((track) => track.stop());
             setStream(null);
             setIsCameraActive(false);
+            setIsFlashlightOn(false);
+            setIsFlashlightSupported(false);
             if (videoRef.current) {
                 videoRef.current.srcObject = null;
+            }
+        }
+    };
+
+    const toggleFlashlight = async () => {
+        if (stream && isFlashlightSupported) {
+            const track = stream.getVideoTracks()[0];
+            try {
+                await track.applyConstraints({
+                    advanced: [{ torch: !isFlashlightOn }]
+                });
+                setIsFlashlightOn(!isFlashlightOn);
+            } catch (err) {
+                console.error("Error toggling flashlight: ", err);
+                toast.error("Gagal menyalakan senter");
             }
         }
     };
@@ -271,6 +296,12 @@ const Classification = () => {
                                         <Camera className="mr-2 h-4 w-4" />
                                         Ambil Gambar
                                     </Button>
+                                    {isFlashlightSupported && (
+                                        <Button variant="outline" onClick={toggleFlashlight} className="w-full sm:w-auto">
+                                            <Zap className={`mr-2 h-4 w-4 ${isFlashlightOn ? 'text-yellow-400' : ''}`} />
+                                            {isFlashlightOn ? "Matikan Senter" : "Nyalakan Senter"}
+                                        </Button>
+                                    )}
                                     <Button variant="outline" onClick={stopCamera} className="w-full sm:w-auto">
                                         <X className="mr-2 h-4 w-4" />
                                         Batal
