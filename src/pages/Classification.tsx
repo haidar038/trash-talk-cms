@@ -1,7 +1,8 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Loader2, Upload, Image as ImageIcon, AlertCircle, PieChart } from "lucide-react";
+import { Loader2, Upload, ImageIcon, AlertCircle, Camera, X } from "lucide-react";
 import { toast } from "sonner";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { Pie } from "react-chartjs-2";
@@ -11,6 +12,7 @@ interface WasteType {
     category: string;
     percentage: number;
     recyclable: boolean;
+    recycle_reason: string;
     decomposition_time: string;
     materials: { type: string; percentage: number }[];
 }
@@ -31,13 +33,82 @@ const Classification = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const [results, setResults] = useState<AnalysisResult | null>(null);
+    const [stream, setStream] = useState<MediaStream | null>(null);
+    const [isCameraActive, setIsCameraActive] = useState(false);
+    const videoRef = useRef<HTMLVideoElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    // Cleanup camera stream on unmount
+    useEffect(() => {
+        return () => {
+            stopCamera();
+        };
+    }, []);
+
+    // Setup video stream when camera becomes active
+    useEffect(() => {
+        if (stream && videoRef.current) {
+            videoRef.current.srcObject = stream;
+        }
+    }, [stream]);
+
+    const startCamera = async () => {
+        try {
+            const mediaStream = await navigator.mediaDevices.getUserMedia({
+                video: {
+                    facingMode: "environment",
+                    width: { ideal: 1280 },
+                    height: { ideal: 720 },
+                },
+            });
+            setStream(mediaStream);
+            setIsCameraActive(true);
+            setError("");
+        } catch (err) {
+            console.error("Error accessing camera: ", err);
+            setError("Tidak dapat mengakses kamera. Pastikan Anda telah memberikan izin akses kamera.");
+            toast.error("Gagal mengakses kamera");
+        }
+    };
+
+    const stopCamera = () => {
+        if (stream) {
+            stream.getTracks().forEach((track) => track.stop());
+            setStream(null);
+            setIsCameraActive(false);
+            if (videoRef.current) {
+                videoRef.current.srcObject = null;
+            }
+        }
+    };
+
+    const captureImage = () => {
+        if (videoRef.current && videoRef.current.readyState === videoRef.current.HAVE_ENOUGH_DATA) {
+            const canvas = document.createElement("canvas");
+            canvas.width = videoRef.current.videoWidth;
+            canvas.height = videoRef.current.videoHeight;
+            const context = canvas.getContext("2d");
+            if (context) {
+                context.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
+                const dataUrl = canvas.toDataURL("image/png");
+                setImageDataUrl(dataUrl);
+                fetch(dataUrl)
+                    .then((res) => res.blob())
+                    .then((blob) => {
+                        const file = new File([blob], "capture.png", { type: "image/png" });
+                        setSelectedFile(file);
+                    });
+                stopCamera();
+                toast.success("Gambar berhasil diambil");
+            }
+        }
+    };
 
     const handleFile = (file: File) => {
         if (!file) return;
 
         if (!file.type.startsWith("image/")) {
-            toast.error("Please upload an image file");
+            toast.error("Mohon unggah file gambar");
             return;
         }
 
@@ -50,7 +121,8 @@ const Classification = () => {
             setImageDataUrl(e.target?.result as string);
         };
         reader.onerror = () => {
-            setError("Failed to read file. Please try again.");
+            setError("Gagal membaca file. Silakan coba lagi.");
+            toast.error("Gagal membaca file");
         };
         reader.readAsDataURL(file);
     };
@@ -62,7 +134,7 @@ const Classification = () => {
         if (file && file.type.startsWith("image/")) {
             handleFile(file);
         } else {
-            toast.error("Please upload an image file");
+            toast.error("Mohon unggah file gambar");
         }
     };
 
@@ -102,10 +174,12 @@ const Classification = () => {
     - Respons HARUS dalam format JSON yang valid
     - Jangan tambahkan teks apapun di luar JSON
     - Persentase harus total 100% untuk semua waste_types
-    - Persentase materials dalam setiap waste_type harus total 100%`;
+    - Persentase materials dalam setiap waste_type harus total 100%
+    - Bedakan jenis sampah dan nama sampah, dimana jenis adalah kategori umum (organik, anorganik, B3, elektronik) dan nama adalah identifikasi spesifik (misal: botol plastik, kertas koran, baterai, dll)
+    - Sertakan alasan mengapa sampah tersebut dapat atau tidak dapat didaur ulang dalam properti "recycle_reason". Paragraf harus ringkas`;
 
             if (!window.puter?.ai) {
-                throw new Error("Puter.js is not available. Please ensure the script is loaded.");
+                throw new Error("Puter.js tidak tersedia. Pastikan script sudah dimuat.");
             }
 
             const response = await window.puter.ai.chat(prompt, imageDataUrl, { model: "gpt-5-nano" });
@@ -126,20 +200,32 @@ const Classification = () => {
 
             if (data.error) {
                 setError(data.error);
+                toast.error(data.error);
+            } else {
+                toast.success("Analisis berhasil!");
             }
         } catch (err: any) {
             console.error(err);
-            setError("Error analyzing image: " + (err.message || err));
+            const errorMsg = "Error menganalisis gambar: " + (err.message || err);
+            setError(errorMsg);
+            toast.error("Gagal menganalisis gambar");
         } finally {
             setLoading(false);
         }
     };
 
+    const resetUpload = () => {
+        setImageDataUrl(null);
+        setSelectedFile(null);
+        setResults(null);
+        setError("");
+    };
+
     const getCategoryClass = (category: string) => {
         const cat = category.toLowerCase();
-        if (cat.includes("organic")) return "bg-green-100 text-green-800";
-        if (cat.includes("hazardous")) return "bg-red-100 text-red-800";
-        if (cat.includes("electronic")) return "bg-purple-100 text-purple-800";
+        if (cat.includes("organik")) return "bg-green-100 text-green-800";
+        if (cat.includes("b3") || cat.includes("hazardous")) return "bg-red-100 text-red-800";
+        if (cat.includes("elektronik")) return "bg-purple-100 text-purple-800";
         return "bg-blue-100 text-blue-800";
     };
 
@@ -153,40 +239,57 @@ const Classification = () => {
 
             <Card className="mb-8">
                 <CardContent className="pt-6">
-                    <div
-                        className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-8 text-center hover:border-primary/50 transition-colors cursor-pointer"
-                        onDragOver={(e) => e.preventDefault()}
-                        onDrop={onDrop}
-                        onClick={() => fileInputRef.current?.click()}
-                    >
+                    <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-8 text-center hover:border-primary/50 transition-colors" onDragOver={(e) => e.preventDefault()} onDrop={onDrop}>
                         {imageDataUrl ? (
                             <div className="space-y-4">
-                                <img src={imageDataUrl} alt="Preview" className="max-h-64 mx-auto rounded-lg" />
-                                <Button
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        analyzeImage();
-                                    }}
-                                    disabled={loading}
-                                >
-                                    {loading ? (
-                                        <>
-                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                            Mengidentifikasi...
-                                        </>
-                                    ) : (
-                                        <>
-                                            <ImageIcon className="mr-2 h-4 w-4" />
-                                            Identifikasi Gambar
-                                        </>
-                                    )}
-                                </Button>
+                                <img src={imageDataUrl} alt="Preview" className="max-h-64 mx-auto rounded-lg shadow-md" />
+                                <div className="flex flex-col sm:flex-row justify-center gap-2">
+                                    <Button onClick={analyzeImage} disabled={loading} className="w-full sm:w-auto">
+                                        {loading ? (
+                                            <>
+                                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                Mengidentifikasi...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <ImageIcon className="mr-2 h-4 w-4" />
+                                                Identifikasi Gambar
+                                            </>
+                                        )}
+                                    </Button>
+                                    <Button variant="outline" onClick={resetUpload} className="w-full sm:w-auto">
+                                        <X className="mr-2 h-4 w-4" />
+                                        Hapus
+                                    </Button>
+                                </div>
+                            </div>
+                        ) : isCameraActive ? (
+                            <div className="space-y-4">
+                                <video ref={videoRef} autoPlay playsInline muted className="w-full max-h-96 rounded-lg shadow-md bg-black" />
+                                <div className="flex flex-col sm:flex-row justify-center gap-2">
+                                    <Button onClick={captureImage} className="w-full sm:w-auto">
+                                        <Camera className="mr-2 h-4 w-4" />
+                                        Ambil Gambar
+                                    </Button>
+                                    <Button variant="outline" onClick={stopCamera} className="w-full sm:w-auto">
+                                        <X className="mr-2 h-4 w-4" />
+                                        Batal
+                                    </Button>
+                                </div>
                             </div>
                         ) : (
                             <div className="space-y-4">
-                                <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
-                                <h3 className="text-lg font-semibold">Click or Drag & Drop Image</h3>
-                                <p className="text-sm text-muted-foreground">Supported formats: JPG, PNG, GIF, WEBP (Max 16MB)</p>
+                                <div className="flex flex-col sm:flex-row justify-center gap-2">
+                                    <Button className="w-full sm:flex-1 sm:max-w-xs" onClick={() => fileInputRef.current?.click()}>
+                                        <Upload className="mr-2 h-4 w-4" />
+                                        Unggah Gambar
+                                    </Button>
+                                    <Button className="w-full sm:flex-1 sm:max-w-xs" variant="outline" onClick={startCamera}>
+                                        <Camera className="mr-2 h-4 w-4" />
+                                        Buka Kamera
+                                    </Button>
+                                </div>
+                                <p className="text-sm text-muted-foreground">Atau seret & lepas gambar di sini</p>
                             </div>
                         )}
                         <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={(e) => e.target.files && handleFile(e.target.files[0])} />
@@ -198,7 +301,7 @@ const Classification = () => {
                 <Card className="mb-8 border-destructive">
                     <CardContent className="pt-6">
                         <div className="flex items-center gap-2 text-destructive">
-                            <AlertCircle className="h-5 w-5" />
+                            <AlertCircle className="h-5 w-5 flex-shrink-0" />
                             <p>{error}</p>
                         </div>
                     </CardContent>
@@ -215,7 +318,7 @@ const Classification = () => {
                             {results.waste_types.map((waste, index) => (
                                 <Card key={index}>
                                     <CardContent className="pt-6">
-                                        <h3 className="text-xl font-semibold mb-4">{waste.name}</h3>
+                                        <h3 className="text-xl font-semibold mb-4 first-letter:uppercase">{waste.name}</h3>
                                         <div className="flex flex-wrap gap-2 mb-4">
                                             <span className={`px-3 py-1 rounded-full text-sm ${getCategoryClass(waste.category)}`}>{waste.category}</span>
                                             <span className={`px-3 py-1 rounded-full text-sm ${waste.recyclable ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
@@ -223,18 +326,23 @@ const Classification = () => {
                                             </span>
                                             <span className="px-3 py-1 rounded-full text-sm bg-gray-100 text-gray-800">📊 {waste.percentage}% yakin</span>
                                         </div>
-                                        <p className="text-muted-foreground">⏱️ Waktu Penguraian: {waste.decomposition_time}</p>
+                                        <p className="mb-4">
+                                            <strong>⚠ Catatan Daur Ulang:</strong> <span className="inline-block text-muted-foreground first-letter:uppercase">{waste.recycle_reason}</span>
+                                        </p>
+                                        <p>
+                                            <strong>⏱️ Waktu Penguraian:</strong> <span className="inline-block text-muted-foreground first-letter:uppercase">{waste.decomposition_time}</span>
+                                        </p>
 
                                         {waste.materials && waste.materials.length > 0 && (
-                                            <div className="mt-4">
-                                                <h4 className="text-lg font-semibold mb-2">🔍 Rincian Material:</h4>
-                                                <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+                                            <div className="mt-4 flex flex-wrap gap-2">
+                                                <p className="font-bold">🔍 Rincian Material:</p>
+                                                <Badge variant="outline">
                                                     {waste.materials.map((material, idx) => (
-                                                        <li key={idx}>
+                                                        <div key={idx} className="capitalize">
                                                             {material.type}: {material.percentage}%
-                                                        </li>
+                                                        </div>
                                                     ))}
-                                                </ul>
+                                                </Badge>
                                             </div>
                                         )}
                                     </CardContent>
@@ -251,7 +359,7 @@ const Classification = () => {
                             )}
 
                             {results.environmental_impact && (
-                                <Card className="border-l-4 border-l-warning">
+                                <Card className="border-l-4 border-l-yellow-500">
                                     <CardContent className="pt-6">
                                         <h3 className="text-xl font-semibold mb-2">🌍 Dampak Lingkungan</h3>
                                         <p className="text-muted-foreground">{results.environmental_impact}</p>
@@ -262,7 +370,7 @@ const Classification = () => {
                             {results.disposal_recommendations && results.disposal_recommendations.length > 0 && (
                                 <Card>
                                     <CardContent className="pt-6">
-                                        <h3 className="text-xl font-semibold mb-4">💡 Rekomendasi Pembuangan</h3>
+                                        <h3 className="text-xl font-semibold mb-2">💡 Rekomendasi Pembuangan</h3>
                                         <ul className="list-disc list-inside space-y-2 text-muted-foreground">
                                             {results.disposal_recommendations.map((rec, index) => (
                                                 <li key={index}>{rec}</li>
@@ -277,7 +385,7 @@ const Classification = () => {
                         <div className="lg:sticky lg:top-6 h-fit">
                             <Card>
                                 <CardContent className="pt-6">
-                                    <h3 className="text-xl font-semibold mb-4">Komposisi Sampah</h3>
+                                    <h3 className="text-xl font-semibold mb-4">📈 Komposisi Sampah</h3>
                                     <div className="w-full max-w-[400px] mx-auto">
                                         <Pie
                                             data={{
@@ -297,6 +405,7 @@ const Classification = () => {
                                                         position: "bottom",
                                                     },
                                                 },
+                                                maintainAspectRatio: true,
                                             }}
                                         />
                                     </div>

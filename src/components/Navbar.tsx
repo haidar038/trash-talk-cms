@@ -1,9 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Home, LogOut, BookOpen, Image as ImageIcon, User as UserIcon, Settings, LayoutDashboard } from "lucide-react";
+import { Home, LogOut, BookOpen, Image as ImageIcon, User as UserIcon, Settings, LayoutDashboard, Search } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { getAvatarUrl } from "@/utils/getAvatarUrl";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 const Navbar = () => {
@@ -19,7 +18,7 @@ const Navbar = () => {
         <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-10">
             <div className="container mx-auto px-4 py-4 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                    <img src="/SPL.png" alt="SapuLidi" className="max-h-10 object-contain cursor-pointer" onClick={() => navigate("/")} />
+                    <img src="/SPL.png" alt="SapuLidi" className="max-h-10 object-contain" />
                     <div>
                         <h1 className="text-2xl font-bold cursor-pointer" onClick={() => navigate("/")}>
                             SapuLidi
@@ -28,32 +27,51 @@ const Navbar = () => {
                     </div>
 
                     <nav className="ml-6 hidden md:flex items-center gap-3">
-                        <Button variant="ghost" size="sm" onClick={() => navigate("/")}>
-                            <Home className="w-4 h-4 mr-2" />
-                            Beranda
-                        </Button>
+                        {user ? (
+                            <>
+                                <div className="flex items-center gap-3">
+                                    <Button variant="ghost" size="sm" onClick={() => navigate("/")}>
+                                        <Home className="w-4 h-4 mr-2" />
+                                        Beranda
+                                    </Button>
 
-                        <Button variant="ghost" size="sm" onClick={() => navigate("/articles")}>
-                            <BookOpen className="w-4 h-4 mr-2" />
-                            Edukasi
-                        </Button>
+                                    <Button variant="ghost" size="sm" onClick={() => navigate("/articles")}>
+                                        <BookOpen className="w-4 h-4 mr-2" />
+                                        Edukasi
+                                    </Button>
 
-                        <Button variant="ghost" size="sm" onClick={() => navigate("/classification")}>
-                            <ImageIcon className="w-4 h-4 mr-2" />
-                            Identifikasi
-                        </Button>
+                                    <Button variant="ghost" size="sm" onClick={() => navigate("/classification")}>
+                                        <ImageIcon className="w-4 h-4 mr-2" />
+                                        Identifikasi
+                                    </Button>
+                                </div>
+                            </>
+                        ) : (
+                            <>
+                                <Button variant="ghost" size="sm" onClick={() => navigate("/")}>
+                                    <Home className="w-4 h-4 mr-2" />
+                                    Beranda
+                                </Button>
 
-                        {isAdmin && (
-                            <Button variant="ghost" size="sm" onClick={() => navigate("/dashboard")}>
-                                <LayoutDashboard className="w-4 h-4 mr-2" />
-                                Dashboard
-                            </Button>
+                                <Button variant="ghost" size="sm" onClick={() => navigate("/articles")}>
+                                    <BookOpen className="w-4 h-4 mr-2" />
+                                    Edukasi
+                                </Button>
+                            </>
                         )}
                     </nav>
                 </div>
 
-                <div className="flex items-center gap-3">
-                    {user ? (
+                {user ? (
+                    <div className="flex items-center gap-3">
+                        <div className="hidden lg:block">
+                            {isAdmin && (
+                                <Button variant="ghost" size="sm" onClick={() => navigate("/dashboard")}>
+                                    <LayoutDashboard className="w-4 h-4 mr-2" />
+                                    Dashboard
+                                </Button>
+                            )}
+                        </div>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Avatar className="cursor-pointer">
@@ -61,31 +79,42 @@ const Navbar = () => {
                                     <AvatarFallback>{profile?.full_name?.[0] || profile?.username?.[0] || user.email?.[0].toUpperCase()}</AvatarFallback>
                                 </Avatar>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
+                            <DropdownMenuContent align="end" className="w-48">
                                 <DropdownMenuLabel>{profile?.full_name || profile?.username || user.email}</DropdownMenuLabel>
                                 <DropdownMenuSeparator />
+                                <div className="block lg:hidden">
+                                    {isAdmin && (
+                                        <DropdownMenuItem onClick={() => navigate("/profile")}>
+                                            <LayoutDashboard className="w-4 h-4 mr-2" />
+                                            Dashboard
+                                        </DropdownMenuItem>
+                                    )}
+                                    <DropdownMenuItem onClick={() => navigate("/profile")}>
+                                        <Search className="w-4 h-4 mr-2" />
+                                        Identifikasi
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => navigate("/profile")}>
+                                        <BookOpen className="w-4 h-4 mr-2" />
+                                        Edukasi
+                                    </DropdownMenuItem>
+                                </div>
                                 <DropdownMenuItem onClick={() => navigate("/profile")}>
                                     <UserIcon className="w-4 h-4 mr-2" />
-                                    Profile
+                                    Profil
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => navigate("/profile/edit")}>
-                                    <Settings className="w-4 h-4 mr-2" />
-                                    Settings
-                                </DropdownMenuItem>
-                                <DropdownMenuSeparator />
                                 <DropdownMenuItem onClick={handleSignOut}>
                                     <LogOut className="w-4 h-4 mr-2" />
-                                    Sign Out
+                                    Keluar
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
-                    ) : (
-                        <Button variant="ghost" size="sm" onClick={() => navigate("/auth")}>
-                            <UserIcon className="w-4 h-4 mr-2" />
-                            Masuk
-                        </Button>
-                    )}
-                </div>
+                    </div>
+                ) : (
+                    <Button variant="ghost" size="sm" onClick={() => navigate("/auth")}>
+                        <UserIcon className="w-4 h-4 mr-2" />
+                        Masuk
+                    </Button>
+                )}
             </div>
         </header>
     );

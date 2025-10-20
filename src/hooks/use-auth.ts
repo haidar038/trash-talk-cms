@@ -11,8 +11,7 @@ interface UseAuth {
     isAdmin: boolean;
     loading: boolean;
     error: Error | null;
-    signIn: (credential: string, password: string) => Promise<void>;
-    signInAdmin: (credential: string, password: string) => Promise<void>;
+    signIn: (email: string, password: string) => Promise<void>;
     signUp: (email: string, password: string, userData: { full_name: string; username: string }) => Promise<void>;
     signOut: () => Promise<void>;
 }
@@ -67,52 +66,13 @@ export function useAuth(): UseAuth {
         }
     }
 
-    const getEmailFromCredential = async (credential: string): Promise<string | null> => {
-        const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(credential);
-        if (isEmail) {
-            return credential;
-        }
-        const { data, error } = await supabase.from("profiles").select("email").eq("username", credential).single();
-        if (error || !data) {
-            console.error("Error fetching email for username:", error);
-            return null;
-        }
-        return data.email;
-    };
-
-    async function signIn(credential: string, password: string) {
+    async function signIn(email: string, password: string) {
         try {
-            const email = await getEmailFromCredential(credential);
-            if (!email) throw new Error("Invalid credential");
-
             const { error } = await supabase.auth.signInWithPassword({ email, password });
             if (error) throw error;
         } catch (error) {
             console.error("Error signing in:", error);
             setError(error instanceof Error ? error : new Error("An error occurred during sign in"));
-            throw error; // Re-throw the error to be caught in the component
-        }
-    }
-
-    async function signInAdmin(credential: string, password: string) {
-        try {
-            const email = await getEmailFromCredential(credential);
-            if (!email) throw new Error("Invalid credential");
-
-            const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({ email, password });
-            if (signInError) throw signInError;
-
-            const { data: profile, error: profileError } = await supabase.from("profiles").select("role").eq("id", signInData.user.id).single();
-            if (profileError) throw profileError;
-
-            if (profile.role !== "admin") {
-                await supabase.auth.signOut();
-                throw new Error("You are not authorized to access the admin panel.");
-            }
-        } catch (error) {
-            console.error("Error signing in as admin:", error);
-            setError(error instanceof Error ? error : new Error("An error occurred during admin sign in"));
-            throw error; // Re-throw the error to be caught in the component
         }
     }
 
@@ -152,7 +112,6 @@ export function useAuth(): UseAuth {
         loading,
         error,
         signIn,
-        signInAdmin,
         signUp,
         signOut,
     };

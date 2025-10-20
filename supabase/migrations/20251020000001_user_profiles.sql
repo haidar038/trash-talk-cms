@@ -1,11 +1,5 @@
 -- Create enum for user roles
-DO $$
-BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'user_role') THEN
-    CREATE TYPE user_role AS ENUM ('user', 'admin');
-  END IF;
-END
-$$;
+CREATE TYPE user_role AS ENUM ('user', 'admin');
 
 -- Create profiles table
 CREATE TABLE IF NOT EXISTS public.profiles (
@@ -23,19 +17,16 @@ ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 
 -- Create policies
 -- Allow users to view any profile
-DROP POLICY IF EXISTS "View profiles is enabled for all users" ON public.profiles;
 CREATE POLICY "View profiles is enabled for all users" 
     ON public.profiles FOR SELECT 
     USING (true);
 
 -- Allow users to update their own profile
-DROP POLICY IF EXISTS "Users can update their own profile" ON public.profiles;
 CREATE POLICY "Users can update their own profile"
     ON public.profiles FOR UPDATE
     USING (auth.uid() = id);
 
 -- Allow users to insert their own profile
-DROP POLICY IF EXISTS "Users can insert their own profile" ON public.profiles;
 CREATE POLICY "Users can insert their own profile"
     ON public.profiles FOR INSERT
     WITH CHECK (auth.uid() = id);
