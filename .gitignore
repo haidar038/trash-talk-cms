@@ -33,4 +33,4 @@ jspm_packages/
 .env
 
 # Supabase temp files
-supabase
+/supabase
