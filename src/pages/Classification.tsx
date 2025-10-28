@@ -45,6 +45,7 @@ const Classification = () => {
         return () => {
             stopCamera();
         };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     // Setup video stream when camera becomes active
@@ -55,7 +56,7 @@ const Classification = () => {
             const track = stream.getVideoTracks()[0];
             if (track) {
                 const capabilities = track.getCapabilities();
-                setIsFlashlightSupported(!!capabilities.torch);
+                setIsFlashlightSupported(!!(capabilities as any).torch);
             }
         }
     }, [stream]);
@@ -97,8 +98,8 @@ const Classification = () => {
             const track = stream.getVideoTracks()[0];
             try {
                 await track.applyConstraints({
-                    advanced: [{ torch: !isFlashlightOn }]
-                });
+                    advanced: [{ torch: !isFlashlightOn }],
+                } as any);
                 setIsFlashlightOn(!isFlashlightOn);
             } catch (err) {
                 console.error("Error toggling flashlight: ", err);
@@ -298,7 +299,7 @@ const Classification = () => {
                                     </Button>
                                     {isFlashlightSupported && (
                                         <Button variant="outline" onClick={toggleFlashlight} className="w-full sm:w-auto">
-                                            <Zap className={`mr-2 h-4 w-4 ${isFlashlightOn ? 'text-yellow-400' : ''}`} />
+                                            <Zap className={`mr-2 h-4 w-4 ${isFlashlightOn ? "text-yellow-400" : ""}`} />
                                             {isFlashlightOn ? "Matikan Senter" : "Nyalakan Senter"}
                                         </Button>
                                     )}
