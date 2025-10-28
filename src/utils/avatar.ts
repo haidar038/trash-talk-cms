@@ -23,9 +23,8 @@ export async function uploadAvatar(userId: string, file: File): Promise<{ public
         const fileName = `${userId}/avatar${fileExt}`;
 
         // Upload file ke bucket profile_avatars
-        const { error: uploadError, data: uploadData } = await supabase.storage.from("profile_avatars").upload(fileName, file, {
-            upsert: true,
-            contentType: file.type,
+        const { error: uploadError } = await supabase.storage.from("profile_avatars").upload(fileName, file, {
+            upsert: true
         });
 
         if (uploadError) throw uploadError;

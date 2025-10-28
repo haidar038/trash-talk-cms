@@ -9,6 +9,38 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { supabase } from "@/integrations/supabase/client";
 import { uploadAvatar } from "@/utils/avatar";
+import { Skeleton } from "@/components/ui/skeleton";
+
+const EditProfileSkeleton = () => (
+    <div className="container mx-auto p-4">
+        <Card className="max-w-2xl mx-auto">
+            <CardHeader>
+                <Skeleton className="h-8 w-32" />
+            </CardHeader>
+            <CardContent className="space-y-6">
+                <div className="flex flex-col items-center space-y-4">
+                    <Skeleton className="h-20 w-20 rounded-full" />
+                    <Skeleton className="h-9 w-32" />
+                </div>
+
+                <div className="space-y-2">
+                    <Skeleton className="h-4 w-24" />
+                    <Skeleton className="h-10 w-full" />
+                </div>
+
+                <div className="space-y-2">
+                    <Skeleton className="h-4 w-24" />
+                    <Skeleton className="h-10 w-full" />
+                </div>
+
+                <div className="flex space-x-4">
+                    <Skeleton className="h-10 flex-1" />
+                    <Skeleton className="h-10 flex-1" />
+                </div>
+            </CardContent>
+        </Card>
+    </div>
+);
 
 export default function EditProfile() {
     const { user, profile, loading } = useAuth();
@@ -40,9 +72,9 @@ export default function EditProfile() {
                 throw new Error("File size must be less than 2MB");
             }
 
-            if (!user?.id) throw new Error("No user logged in");
+            if (!profile?.id) throw new Error("No user profile found");
 
-            const { publicUrl, error } = await uploadAvatar(user.id, file);
+            const { publicUrl, error } = await uploadAvatar(profile.id, file);
             if (error) throw error;
 
             if (publicUrl) {
@@ -95,7 +127,7 @@ export default function EditProfile() {
         }
     };
 
-    if (loading) return <div>Loading...</div>;
+    if (loading) return <EditProfileSkeleton />;
     if (!profile) return <div>Profile not found</div>;
 
     return (
@@ -112,7 +144,7 @@ export default function EditProfile() {
                                 <AvatarFallback>{profile.full_name?.[0] || profile.username?.[0] || "?"}</AvatarFallback>
                             </Avatar>
 
-                            <div className="flex items-center space-x-4">
+                            <div className="flex items-center">
                                 <Input type="file" accept="image/*" onChange={handleAvatarChange} disabled={uploading} className="hidden" id="avatar" />
                                 <Label
                                     htmlFor="avatar"

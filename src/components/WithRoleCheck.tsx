@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/use-auth";
+import LoadingSpinner from "./LoadingSpinner";
 
 interface WithRoleCheckProps {
     requiredRole: "admin" | "user";
@@ -17,7 +18,7 @@ export function WithRoleCheck({ requiredRole, children }: WithRoleCheckProps) {
         }
     }, [profile, loading, requiredRole, navigate]);
 
-    if (loading) return <div>Loading...</div>;
+    if (loading) return <LoadingSpinner />;
     if (!profile || profile.role !== requiredRole) return null;
 
     return <>{children}</>;

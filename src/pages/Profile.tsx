@@ -5,13 +5,35 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { useToast } from "@/hooks/use-toast";
 import { getAvatarUrl } from "@/utils/getAvatarUrl";
+import { Skeleton } from "@/components/ui/skeleton";
+
+const ProfileSkeleton = () => (
+    <div className="container mx-auto p-4">
+        <Card className="max-w-2xl mx-auto">
+            <CardHeader>
+                <Skeleton className="h-8 w-24" />
+            </CardHeader>
+            <CardContent className="space-y-6">
+                <div className="flex items-center space-x-4">
+                    <Skeleton className="h-20 w-20 rounded-full" />
+                    <div className="space-y-2">
+                        <Skeleton className="h-8 w-48" />
+                        <Skeleton className="h-6 w-32" />
+                        <Skeleton className="h-6 w-16" />
+                    </div>
+                </div>
+                <div className="space-y-2">
+                    <Skeleton className="h-10 w-full" />
+                </div>
+            </CardContent>
+        </Card>
+    </div>
+);
 
 export default function Profile() {
     const { user, profile, loading } = useAuth();
     const navigate = useNavigate();
-    const { toast } = useToast();
 
     useEffect(() => {
         if (!loading && !user) {
@@ -19,7 +41,7 @@ export default function Profile() {
         }
     }, [user, loading, navigate]);
 
-    if (loading) return <div>Loading...</div>;
+    if (loading) return <ProfileSkeleton />;
     if (!profile) return <div>Profile not found</div>;
 
     return (
