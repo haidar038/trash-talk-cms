@@ -1,11 +1,16 @@
 import { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Loader2, Upload, ImageIcon, AlertCircle, Camera, X, Zap } from "lucide-react";
+import { Loader2, Upload, ImageIcon, AlertCircle, Camera, X, Zap, History } from "lucide-react";
 import { toast } from "sonner";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { Pie } from "react-chartjs-2";
+import { useClassificationHistory } from "@/hooks/use-classification-history";
+import { useAuth } from "@/hooks/use-auth"; // Add this
+import { supabase } from "@/integrations/supabase/client"; // Add this
+import { Json } from "@/integrations/supabase/types"; // Add this for type casting
 
 interface WasteType {
     name: string;
@@ -28,6 +33,7 @@ interface AnalysisResult {
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 const Classification = () => {
+    const navigate = useNavigate();
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [imageDataUrl, setImageDataUrl] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
@@ -39,6 +45,8 @@ const Classification = () => {
     const [isFlashlightSupported, setIsFlashlightSupported] = useState(false);
     const videoRef = useRef<HTMLVideoElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const user = useAuth().user;
+    const { saveClassification } = useClassificationHistory(user?.id);
 
     // Cleanup camera stream on unmount
     useEffect(() => {
@@ -172,37 +180,36 @@ const Classification = () => {
 
         try {
             const prompt = `Analisa gambar ini dan identifikasi jenis sampah yang terlihat.
-            
-    Berikan respons dalam format JSON dengan struktur berikut:
-    {
-    "waste_types": [
-        {
-        "name": "nama jenis sampah",
-        "category": "organik/anorganik/B3/elektronik",
-        "percentage": estimasi persentase komposisi (angka saja),
-        "recyclable": true/false,
-        "decomposition_time": "waktu penguraian estimasi",
-        "materials": [
-            {
-            "type": "jenis material (contoh: plastik, kertas, metal, kaca, organik, tekstil)",
-            "percentage": estimasi persentase material (angka saja)
-            }
-        ]
-        }
-    ],
-    "overall_assessment": "penilaian keseluruhan kondisi sampah",
-    "disposal_recommendations": ["rekomendasi pengelolaan 1", "rekomendasi 2", "rekomendasi 3"],
-    "environmental_impact": "dampak lingkungan jika tidak dikelola dengan baik"
-    }
+                            Berikan respons dalam format JSON dengan struktur berikut:
+                            {
+                            "waste_types": [
+                                {
+                                "name": "nama jenis sampah",
+                                "category": "organik/anorganik/B3/elektronik",
+                                "percentage": estimasi persentase komposisi (angka saja),
+                                "recyclable": true/false,
+                                "decomposition_time": "waktu penguraian estimasi",
+                                "materials": [
+                                    {
+                                    "type": "jenis material (contoh: plastik, kertas, metal, kaca, organik, tekstil)",
+                                    "percentage": estimasi persentase material (angka saja)
+                                    }
+                                ]
+                                }
+                            ],
+                            "overall_assessment": "penilaian keseluruhan kondisi sampah",
+                            "disposal_recommendations": ["rekomendasi pengelolaan 1", "rekomendasi 2", "rekomendasi 3"],
+                            "environmental_impact": "dampak lingkungan jika tidak dikelola dengan baik"
+                            }
 
-    PENTING:
-    - Jika tidak ada sampah yang terdeteksi dalam gambar, return: {"error": "Tidak terdeteksi sampah dalam gambar", "waste_types": []}
-    - Respons HARUS dalam format JSON yang valid
-    - Jangan tambahkan teks apapun di luar JSON
-    - Persentase harus total 100% untuk semua waste_types
-    - Persentase materials dalam setiap waste_type harus total 100%
-    - Bedakan jenis sampah dan nama sampah, dimana jenis adalah kategori umum (organik, anorganik, B3, elektronik) dan nama adalah identifikasi spesifik (misal: botol plastik, kertas koran, baterai, dll)
-    - Sertakan alasan mengapa sampah tersebut dapat atau tidak dapat didaur ulang dalam properti "recycle_reason". Paragraf harus ringkas`;
+                            PENTING:
+                            - Jika tidak ada sampah yang terdeteksi dalam gambar, return: {"error": "Tidak terdeteksi sampah dalam gambar", "waste_types": []}
+                            - Respons HARUS dalam format JSON yang valid
+                            - Jangan tambahkan teks apapun di luar JSON
+                            - Persentase harus total 100% untuk semua waste_types
+                            - Persentase materials dalam setiap waste_type harus total 100%
+                            - Bedakan jenis sampah dan nama sampah, dimana jenis adalah kategori umum (organik, anorganik, B3, elektronik) dan nama adalah identifikasi spesifik (misal: botol plastik, kertas koran, baterai, dll)
+                            - Sertakan alasan mengapa sampah tersebut dapat atau tidak dapat didaur ulang dalam properti "recycle_reason". Paragraf harus ringkas`;
 
             if (!window.puter?.ai) {
                 throw new Error("Puter.js tidak tersedia. Pastikan script sudah dimuat.");
@@ -229,6 +236,18 @@ const Classification = () => {
                 toast.error(data.error);
             } else {
                 toast.success("Analisis berhasil!");
+
+                // Save to history - ADD THIS
+                if (user?.id) {
+                    const avgPercentage = data.waste_types.reduce((sum, w) => sum + w.percentage, 0) / data.waste_types.length;
+
+                    saveClassification.mutate({
+                        user_id: user.id,
+                        image_url: imageDataUrl,
+                        result: data,
+                        accuracy: avgPercentage / 100, // Convert percentage to 0-1 range
+                    });
+                }
             }
         } catch (err: any) {
             console.error(err);
@@ -258,7 +277,15 @@ const Classification = () => {
     return (
         <div className="container mx-auto px-4 py-8 max-w-4xl">
             <div className="text-center mb-8">
-                <h1 className="text-4xl font-bold mb-4">🌱 Klasifikasi Sampah dengan AI</h1>
+                <div className="flex items-center justify-center gap-4 mb-4">
+                    <h1 className="text-4xl font-bold">🌱 Klasifikasi Sampah dengan AI</h1>
+                    {user && (
+                        <Button variant="outline" size="sm" onClick={() => navigate("/classification/history")}>
+                            <History className="w-4 h-4 mr-2" />
+                            Lihat Riwayat
+                        </Button>
+                    )}
+                </div>
                 <p className="text-xl text-muted-foreground mb-2">Unggah gambar limbah untuk identifikasi otomatis menggunakan kecerdasan buatan (AI).</p>
                 <span className="inline-block bg-primary/10 text-primary text-sm px-3 py-1 rounded-full">⚡ Powered by Puter.js + OpenAI GPT-5-Nano</span>
             </div>

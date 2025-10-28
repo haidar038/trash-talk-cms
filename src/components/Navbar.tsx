@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Home, LogOut, BookOpen, Image as ImageIcon, User as UserIcon, Settings, LayoutDashboard, Search } from "lucide-react";
+import { Home, LogOut, BookOpen, Image as ImageIcon, User as UserIcon, Settings, LayoutDashboard, Search, History } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -43,6 +43,11 @@ const Navbar = () => {
                                     <Button variant="ghost" size="sm" onClick={() => navigate("/classification")}>
                                         <ImageIcon className="w-4 h-4 mr-2" />
                                         Identifikasi
+                                    </Button>
+
+                                    <Button variant="ghost" size="sm" onClick={() => navigate("/classification/history")}>
+                                        <History className="w-4 h-4 mr-2" />
+                                        Riwayat
                                     </Button>
                                 </div>
                             </>
@@ -92,6 +97,10 @@ const Navbar = () => {
                                     <DropdownMenuItem onClick={() => navigate("/classification")}>
                                         <Search className="w-4 h-4 mr-2" />
                                         Identifikasi
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => navigate("/classification/history")}>
+                                        <History className="w-4 h-4 mr-2" />
+                                        Riwayat Klasifikasi
                                     </DropdownMenuItem>
                                     <DropdownMenuItem onClick={() => navigate("/articles")}>
                                         <BookOpen className="w-4 h-4 mr-2" />

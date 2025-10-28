@@ -17,6 +17,7 @@ import Classification from "./pages/Classification";
 import Profile from "./pages/Profile";
 import EditProfile from "./pages/EditProfile";
 import NotFound from "./pages/NotFound";
+import ClassificationHistory from "./pages/ClassificationHistory";
 
 const queryClient = new QueryClient();
 
@@ -61,6 +62,7 @@ const App = () => (
                         <Route path="/articles" element={<Articles />} />
                         <Route path="/article/:id" element={<ArticleDetail />} />
                         <Route path="/classification" element={<Classification />} />
+                        <Route path="/classification/history" element={<ClassificationHistory />} />
 
                         {/* Profile Routes */}
                         <Route path="/profile" element={<Profile />} />
