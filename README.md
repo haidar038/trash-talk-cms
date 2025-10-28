@@ -1,73 +1,96 @@
-# Welcome to your Lovable project
+# Trash Talk CMS
 
-## Project info
+Trash Talk CMS is a web application built to manage and classify trash-related articles and data. It provides a platform for administrators to create and manage articles, and for users to browse articles and use a trash classification tool.
 
-**URL**: https://lovable.dev/projects/da341c78-b57d-429b-9c83-507cb7e1f232
+## Features
 
-## How can I edit this code?
+*   **User Authentication:** Secure user sign-up and login functionality using Supabase Auth.
+*   **Role-Based Access Control:** Differentiates between regular users and administrators, with specific privileges for admins.
+*   **Article Management (Admin):** Admins can create, edit, and delete articles.
+*   **Public Article Viewing:** All users can browse and read articles.
+*   **Trash Classification:** A tool to classify trash based on text input (Note: current implementation is a placeholder).
+*   **User Profiles:** Users can view and edit their profiles, including uploading a custom avatar.
+*   **Admin Dashboard:** A dashboard for administrators to view statistics like total users, articles, and classifications.
 
-There are several ways of editing your application.
+## Tech Stack
 
-**Use Lovable**
+*   **Frontend:**
+    *   **Framework:** [React](https://reactjs.org/)
+    *   **Build Tool:** [Vite](https://vitejs.dev/)
+    *   **Language:** [TypeScript](https://www.typescriptlang.org/)
+    *   **Styling:** [Tailwind CSS](https://tailwindcss.com/)
+    *   **UI Components:** [shadcn/ui](https://ui.shadcn.com/)
+*   **Backend & Database:**
+    *   [Supabase](https://supabase.io/) - Used for database, authentication, and storage.
+*   **Routing:**
+    *   [React Router](https://reactrouter.com/)
+*   **Data Fetching/State Management:**
+    *   [TanStack Query](https://tanstack.com/query/v5)
+*   **Form Handling:**
+    *   [React Hook Form](https://react-hook-form.com/)
+    *   [Zod](https://zod.dev/) (for validation)
+*   **Data Visualization:**
+    *   [Recharts](https://recharts.org/)
+    *   [Chart.js](https://www.chartjs.org/)
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/da341c78-b57d-429b-9c83-507cb7e1f232) and start prompting.
+## Getting Started
 
-Changes made via Lovable will be committed automatically to this repo.
+### Prerequisites
 
-**Use your preferred IDE**
+*   Node.js and npm (or bun)
+*   A Supabase project
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Installation
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/your-username/trash-talk-cms.git
+    cd trash-talk-cms
+    ```
 
-Follow these steps:
+2.  **Install dependencies:**
+    ```bash
+    npm install
+    ```
+    or
+    ```bash
+    bun install
+    ```
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+3.  **Set up environment variables:**
+    Create a `.env` file in the root of the project and add your Supabase project URL and anon key:
+    ```
+    VITE_SUPABASE_URL=your-supabase-url
+    VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
+    ```
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+4.  **Set up the database:**
+    Run the SQL scripts in the `database` directory in your Supabase SQL editor to create the necessary tables and policies.
 
-# Step 3: Install the necessary dependencies.
-npm i
+    *   `articles_schema.sql`
+    *   `profile_schema.sql`
+    *   `classification_history.sql`
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+### Running the application
+
+```bash
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+The application should now be running on `http://localhost:5173`.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Project Structure
 
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/da341c78-b57d-429b-9c83-507cb7e1f232) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+```
+/
+├── public/              # Static assets
+├── src/
+│   ├── components/      # Reusable UI components
+│   ├── hooks/           # Custom React hooks
+│   ├── integrations/    # Supabase client setup
+│   ├── lib/             # Utility functions
+│   ├── pages/           # Application pages/routes
+│   └── ...
+├── database/            # SQL schema files
+└── ...
+```
