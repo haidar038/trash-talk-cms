@@ -1,6 +1,6 @@
-# Trash Talk CMS
+# SapuLidi
 
-Trash Talk CMS is a web application built to manage and classify trash-related articles and data. It provides a platform for administrators to create and manage articles, and for users to browse articles and use a trash classification tool.
+SapuLidi is a web application built to manage and classify trash-related articles and data. It provides a platform for administrators to create and manage articles, and for users to browse articles and use a trash classification tool.
 
 ## Features
 
