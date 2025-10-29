@@ -1,1 +1,40 @@
 @import "tailwindcss";
+
+/* Atur default styling untuk konten Tiptap (ProseMirror) */
+.ProseMirror {
+    outline: none;
+}
+
+.ProseMirror > * + * {
+    margin-top: 0.75em;
+}
+
+.ProseMirror ul,
+.ProseMirror ol {
+    padding: 0 1rem;
+}
+
+.ProseMirror h1,
+.ProseMirror h2,
+.ProseMirror h3 {
+    line-height: 1.1;
+    font-weight: 600;
+}
+
+.ProseMirror h1 {
+    font-size: 1.75rem; /* 28px */
+}
+
+.ProseMirror h2 {
+    font-size: 1.5rem; /* 24px */
+}
+
+.ProseMirror h3 {
+    font-size: 1.25rem; /* 20px */
+}
+
+.ProseMirror blockquote {
+    padding-left: 1rem;
+    border-left: 3px solid;
+    font-style: italic;
+}

@@ -4,13 +4,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useNavigate } from "react-router-dom";
-import { Calendar, Tag, ArrowLeft, Search } from "lucide-react";
+import { Calendar, Tag, ArrowLeft, Search, Plus } from "lucide-react";
 import { format } from "date-fns";
 import { useState } from "react";
+import { useAuth } from "@/hooks/use-auth";
 
 const Articles = () => {
     const navigate = useNavigate();
     const [searchQuery, setSearchQuery] = useState("");
+    const { user, isAdmin } = useAuth();
 
     const { data: articles, isLoading } = useQuery({
         queryKey: ["public-articles"],
@@ -22,9 +24,20 @@ const Articles = () => {
         },
     });
 
-    const filteredArticles = articles?.filter(
-        (article) => article.title.toLowerCase().includes(searchQuery.toLowerCase()) || article.content.toLowerCase().includes(searchQuery.toLowerCase()) || article.category.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    const filteredArticles = articles
+        ?.map((article) => ({
+            ...article,
+            // Buat versi plain text dari konten untuk pencarian dan preview
+            // Ganti semua tag HTML dengan spasi
+            plainContent: article.content.replace(/<[^>]+>/g, " ") || "",
+        }))
+        .filter(
+            (article) =>
+                article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                // Gunakan plainContent untuk pencarian
+                article.plainContent.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                article.category.toLowerCase().includes(searchQuery.toLowerCase())
+        );
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-background via-secondary/30 to-accent/20">
@@ -35,12 +48,26 @@ const Articles = () => {
                         Back to Home
                     </Button>
 
-                    <div className="mb-8">
-                        <h1 className="text-4xl font-bold mb-4">All Articles</h1>
-                        <div className="relative max-w-md">
-                            <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                            <Input placeholder="Search articles..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-10" />
+                    <div className="mb-8 flex flex-col lg:flex-row justify-between lg:items-end">
+                        <div>
+                            <h1 className="text-4xl font-bold mb-4">All Articles</h1>
+                            <div className="relative max-w-md">
+                                <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                                <Input placeholder="Search articles..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-10" />
+                            </div>
                         </div>
+                        {user && (
+                            <>
+                                {isAdmin && (
+                                    <div className="lg:mt-0 mt-3">
+                                        <Button onClick={() => navigate("/create")}>
+                                            <Plus className="w-4 h-4 mr-2" />
+                                            Buat Artikel
+                                        </Button>
+                                    </div>
+                                )}
+                            </>
+                        )}
                     </div>
 
                     {isLoading ? (
@@ -64,7 +91,8 @@ const Articles = () => {
                                         </CardDescription>
                                     </CardHeader>
                                     <CardContent>
-                                        <p className="text-sm text-muted-foreground line-clamp-3">{article.content}</p>
+                                        {/* Gunakan plainContent untuk preview */}
+                                        <p className="text-sm text-muted-foreground line-clamp-3">{article.plainContent}</p>
                                     </CardContent>
                                 </Card>
                             ))}

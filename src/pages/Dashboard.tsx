@@ -18,6 +18,10 @@ interface Article {
     updated_at: string;
 }
 
+interface ArticleWithPlainText extends Article {
+    plainContent: string;
+}
+
 const Dashboard = () => {
     const navigate = useNavigate();
     const [searchQuery, setSearchQuery] = useState("");
@@ -62,11 +66,11 @@ const Dashboard = () => {
         }
     };
 
-    const handleSignOut = async () => {
-        await supabase.auth.signOut();
-        toast.success("Signed out successfully");
-        navigate("/auth");
-    };
+    // const handleSignOut = async () => {
+    //     await supabase.auth.signOut();
+    //     toast.success("Signed out successfully");
+    //     navigate("/auth");
+    // };
 
     const handleDelete = async () => {
         if (!deleteId) return;
@@ -92,21 +96,41 @@ const Dashboard = () => {
         );
     }
 
+    const filteredArticles: ArticleWithPlainText[] = articles
+        .map((article) => ({
+            ...article,
+            // Buat versi plain text dari konten untuk pencarian dan preview
+            plainContent: article.content.replace(/<[^>]+>/g, " ") || "",
+        }))
+        .filter(
+            (article) =>
+                article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                // Gunakan plainContent untuk pencarian
+                article.plainContent.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                article.category.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+
     return (
         <div className="min-h-screen bg-gradient-to-br from-background via-secondary/20 to-accent/10">
-            <main className="container mx-auto px-4 py-8">
-                <div className="mb-8">
-                    <h2 className="text-3xl font-bold mb-2">Artikel Anda</h2>
-                    <p className="text-muted-foreground mb-4">Kelola artikel edukasi tentang pengolahan sampah</p>
-                    <div className="relative max-w-md">
-                        <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                        <Input placeholder="Search your articles..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-10" />
+            <main className="max-w-6xl mx-auto px-4 py-8">
+                <div className="mb-8 flex flex-col lg:flex-row justify-between lg:items-end">
+                    <div>
+                        <h2 className="text-3xl font-bold mb-2">Artikel Anda</h2>
+                        <p className="text-muted-foreground mb-4">Kelola artikel edukasi tentang pengolahan sampah</p>
+                        <div className="relative max-w-md">
+                            <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                            <Input placeholder="Search your articles..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-10" />
+                        </div>
+                    </div>
+                    <div className="lg:mt-0 mt-3">
+                        <Button onClick={() => navigate("/create")}>
+                            <Plus className="w-4 h-4 mr-2" />
+                            Buat Artikel
+                        </Button>
                     </div>
                 </div>
 
-                {articles.filter(
-                    (article) => article.title.toLowerCase().includes(searchQuery.toLowerCase()) || article.content.toLowerCase().includes(searchQuery.toLowerCase()) || article.category.toLowerCase().includes(searchQuery.toLowerCase())
-                ).length === 0 ? (
+                {filteredArticles.length === 0 ? (
                     <Card className="text-center py-12">
                         <CardContent>
                             <Recycle className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
@@ -119,38 +143,33 @@ const Dashboard = () => {
                         </CardContent>
                     </Card>
                 ) : (
-                    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                        {articles
-                            .filter(
-                                (article) =>
-                                    article.title.toLowerCase().includes(searchQuery.toLowerCase()) || article.content.toLowerCase().includes(searchQuery.toLowerCase()) || article.category.toLowerCase().includes(searchQuery.toLowerCase())
-                            )
-                            .map((article) => (
-                                <Card key={article.id} className="hover:shadow-lg transition-shadow">
-                                    <CardHeader>
-                                        <div className="flex items-start justify-between gap-2">
-                                            <div className="flex-1 min-w-0">
-                                                <CardTitle className="truncate">{article.title}</CardTitle>
-                                                <CardDescription className="mt-1">{article.category}</CardDescription>
-                                            </div>
+                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 items-start">
+                        {filteredArticles.map((article) => (
+                            <Card key={article.id} className="hover:shadow-lg transition-shadow w-full max-w-xl mx-auto">
+                                <CardHeader>
+                                    <div className="flex items-start justify-between gap-2">
+                                        <div className="flex-1 min-w-0">
+                                            <CardTitle className="truncate">{article.title}</CardTitle>
+                                            <CardDescription className="mt-1">{article.category}</CardDescription>
                                         </div>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <p className="text-sm text-muted-foreground line-clamp-3 mb-4">{article.content}</p>
-                                        <div className="flex items-center justify-between">
-                                            <span className="text-xs text-muted-foreground">{new Date(article.created_at).toLocaleDateString()}</span>
-                                            <div className="flex gap-2">
-                                                <Button size="sm" variant="outline" onClick={() => navigate(`/edit/${article.id}`)}>
-                                                    <Edit className="w-4 h-4" />
-                                                </Button>
-                                                <Button size="sm" variant="outline" onClick={() => setDeleteId(article.id)}>
-                                                    <Trash2 className="w-4 h-4" />
-                                                </Button>
-                                            </div>
+                                    </div>
+                                </CardHeader>
+                                <CardContent>
+                                    <p className="text-sm text-muted-foreground line-clamp-3 mb-4">{article.plainContent}</p>
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-xs text-muted-foreground">{new Date(article.created_at).toLocaleDateString()}</span>
+                                        <div className="flex gap-2">
+                                            <Button size="sm" variant="outline" onClick={() => navigate(`/edit/${article.id}`)}>
+                                                <Edit className="w-4 h-4" />
+                                            </Button>
+                                            <Button size="sm" variant="outline" onClick={() => setDeleteId(article.id)}>
+                                                <Trash2 className="w-4 h-4" />
+                                            </Button>
                                         </div>
-                                    </CardContent>
-                                </Card>
-                            ))}
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        ))}
                     </div>
                 )}
             </main>

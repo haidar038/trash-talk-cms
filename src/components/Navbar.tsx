@@ -89,7 +89,7 @@ const Navbar = () => {
                                 <DropdownMenuSeparator />
                                 <div className="block lg:hidden">
                                     {isAdmin && (
-                                        <DropdownMenuItem onClick={() => navigate("/profile")}>
+                                        <DropdownMenuItem onClick={() => navigate("/dashboard")}>
                                             <LayoutDashboard className="w-4 h-4 mr-2" />
                                             Dashboard
                                         </DropdownMenuItem>

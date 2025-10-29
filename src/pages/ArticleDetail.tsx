@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Calendar, Tag } from "lucide-react";
 import { format } from "date-fns";
+import "@/index.css";
 
 const ArticleDetail = () => {
     const { id } = useParams();
@@ -69,16 +70,7 @@ const ArticleDetail = () => {
 
                         <h1 className="text-4xl font-bold mb-6">{article.title}</h1>
 
-                        <div className="prose prose-lg dark:prose-invert max-w-none">
-                            {article.content.split("\n").map(
-                                (paragraph: string, index: number) =>
-                                    paragraph.trim() && (
-                                        <p key={index} className="mb-4">
-                                            {paragraph}
-                                        </p>
-                                    )
-                            )}
-                        </div>
+                        <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: article.content }} />
                     </div>
                 </article>
             </div>
