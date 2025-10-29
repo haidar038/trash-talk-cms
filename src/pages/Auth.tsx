@@ -118,8 +118,8 @@ const Auth = () => {
                                 </div>
                                 <div className="space-y-2">
                                     <Label htmlFor="signin-password">Kata Sandi</Label>
-                                    <InputGroup>
-                                        <InputGroupInput
+                                    <div className="relative">
+                                        <Input
                                             id="signin-password"
                                             type={showPassword ? "text" : "password"}
                                             placeholder="••••••••"
@@ -128,13 +128,19 @@ const Auth = () => {
                                             required
                                             disabled={isLoading}
                                             minLength={6}
+                                            className="pr-10" // ruang untuk tombol
                                         />
-                                        <InputGroupAddon align="inline-end">
-                                            <InputGroupButton aria-label="Toggle password visibility" title="Toggle password visibility" size="icon-xs" onClick={() => setShowPassword(!showPassword)} disabled={isLoading}>
-                                                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                                            </InputGroupButton>
-                                        </InputGroupAddon>
-                                    </InputGroup>
+                                        <button
+                                            type="button"
+                                            aria-label="Toggle password visibility"
+                                            title="Toggle password visibility"
+                                            onClick={() => setShowPassword(!showPassword)}
+                                            disabled={isLoading}
+                                            className="absolute inset-y-0 right-0 flex items-center pr-3"
+                                        >
+                                            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                        </button>
+                                    </div>
                                 </div>
                                 <Button type="submit" className="w-full" disabled={isLoading}>
                                     {isLoading ? (
@@ -161,8 +167,8 @@ const Auth = () => {
                                 </div>
                                 <div className="space-y-2">
                                     <Label htmlFor="signup-password">Kata Sandi</Label>
-                                    <InputGroup>
-                                        <InputGroupInput
+                                    <div className="relative">
+                                        <Input
                                             id="signup-password"
                                             type={showPassword ? "text" : "password"}
                                             placeholder="••••••••"
@@ -172,13 +178,19 @@ const Auth = () => {
                                             disabled={isLoading}
                                             pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
                                             title="Password harus memiliki minimal 8 karakter, mengandung huruf besar, huruf kecil, angka, dan karakter khusus"
+                                            className="pr-10"
                                         />
-                                        <InputGroupAddon align="inline-end">
-                                            <InputGroupButton aria-label="Toggle password visibility" title="Toggle password visibility" size="icon-xs" onClick={() => setShowPassword(!showPassword)} disabled={isLoading}>
-                                                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                                            </InputGroupButton>
-                                        </InputGroupAddon>
-                                    </InputGroup>
+                                        <button
+                                            type="button"
+                                            aria-label="Toggle password visibility"
+                                            title="Toggle password visibility"
+                                            onClick={() => setShowPassword(!showPassword)}
+                                            disabled={isLoading}
+                                            className="absolute inset-y-0 right-0 flex items-center pr-3"
+                                        >
+                                            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                        </button>
+                                    </div>
                                 </div>
                                 <Button type="submit" className="w-full" disabled={isLoading}>
                                     {isLoading ? (
