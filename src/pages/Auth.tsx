@@ -92,32 +92,31 @@ const Auth = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-secondary/20 to-accent/10 p-4">
-            <Card className="w-full max-w-md shadow-2xl border-border/50">
-                <CardHeader className="space-y-3 text-center">
-                    <div className="mx-auto w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-2">
-                        {/* <Recycle className="w-9 h-9 text-primary" /> */}
-                        <img src="/SPL.png" alt="SapuLidi" className="max-h-10 object-contain" />
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-secondary/20 to-accent/10 px-4 sm:px-6 py-6 sm:py-8">
+            <Card className="w-full max-w-sm sm:max-w-md md:max-w-lg shadow-2xl border-border/50">
+                <CardHeader className="space-y-2 sm:space-y-3 text-center p-4 sm:p-5 md:p-6">
+                    <div className="mx-auto w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full bg-primary/10 flex items-center justify-center mb-1 sm:mb-2">
+                        <img src="/SPL.png" alt="SapuLidi" className="max-h-8 sm:max-h-9 md:max-h-10 object-contain" />
                     </div>
-                    <CardTitle className="text-3xl font-bold">
+                    <CardTitle className="text-2xl sm:text-3xl md:text-4xl font-bold">
                         Sapu<span className="text-primary">Lidi</span>
                     </CardTitle>
-                    <CardDescription>Akses dan nikmati fitur lengkap SapuLidi</CardDescription>
+                    <CardDescription className="text-xs sm:text-sm md:text-base">Akses dan nikmati fitur lengkap SapuLidi</CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="p-4 sm:p-5 md:p-6">
                     <Tabs defaultValue="signin" className="w-full">
-                        <TabsList className="grid w-full grid-cols-2">
-                            <TabsTrigger value="signin">Masuk</TabsTrigger>
-                            <TabsTrigger value="signup">Registrasi</TabsTrigger>
+                        <TabsList className="grid w-full grid-cols-2 h-9 sm:h-10">
+                            <TabsTrigger value="signin" className="text-xs sm:text-sm">Masuk</TabsTrigger>
+                            <TabsTrigger value="signup" className="text-xs sm:text-sm">Registrasi</TabsTrigger>
                         </TabsList>
                         <TabsContent value="signin">
-                            <form onSubmit={handleSignIn} className="space-y-4">
-                                <div className="space-y-2">
-                                    <Label htmlFor="signin-email">Email</Label>
-                                    <Input id="signin-email" type="email" placeholder="budi@email.com" value={email} onChange={(e) => setEmail(e.target.value)} required disabled={isLoading} />
+                            <form onSubmit={handleSignIn} className="space-y-3 sm:space-y-4">
+                                <div className="space-y-1.5 sm:space-y-2">
+                                    <Label htmlFor="signin-email" className="text-xs sm:text-sm">Email</Label>
+                                    <Input id="signin-email" type="email" placeholder="budi@email.com" value={email} onChange={(e) => setEmail(e.target.value)} required disabled={isLoading} className="text-sm sm:text-base h-9 sm:h-10" />
                                 </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="signin-password">Kata Sandi</Label>
+                                <div className="space-y-1.5 sm:space-y-2">
+                                    <Label htmlFor="signin-password" className="text-xs sm:text-sm">Kata Sandi</Label>
                                     <div className="relative">
                                         <Input
                                             id="signin-password"
@@ -128,7 +127,7 @@ const Auth = () => {
                                             required
                                             disabled={isLoading}
                                             minLength={6}
-                                            className="pr-10" // ruang untuk tombol
+                                            className="pr-10 text-sm sm:text-base h-9 sm:h-10"
                                         />
                                         <button
                                             type="button"
@@ -138,14 +137,14 @@ const Auth = () => {
                                             disabled={isLoading}
                                             className="absolute inset-y-0 right-0 flex items-center pr-3"
                                         >
-                                            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                            {showPassword ? <EyeOff className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> : <Eye className="h-3.5 w-3.5 sm:h-4 sm:w-4" />}
                                         </button>
                                     </div>
                                 </div>
-                                <Button type="submit" className="w-full" disabled={isLoading}>
+                                <Button type="submit" className="w-full text-xs sm:text-sm h-9 sm:h-10 md:h-11" disabled={isLoading}>
                                     {isLoading ? (
                                         <>
-                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                            <Loader2 className="mr-1.5 sm:mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4 animate-spin" />
                                             Sedang Masuk...
                                         </>
                                     ) : (
@@ -155,18 +154,18 @@ const Auth = () => {
                             </form>
                         </TabsContent>
                         <TabsContent value="signup">
-                            <form onSubmit={handleSignUp} className="space-y-4">
-                                <div className="space-y-2">
-                                    <Label htmlFor="signup-fullname">Nama Lengkap</Label>
-                                    <Input id="signup-fullname" type="text" placeholder="Budi Santoso" value={fullName} onChange={(e) => setFullName(e.target.value)} required disabled={isLoading} minLength={3} />
+                            <form onSubmit={handleSignUp} className="space-y-3 sm:space-y-4">
+                                <div className="space-y-1.5 sm:space-y-2">
+                                    <Label htmlFor="signup-fullname" className="text-xs sm:text-sm">Nama Lengkap</Label>
+                                    <Input id="signup-fullname" type="text" placeholder="Budi Santoso" value={fullName} onChange={(e) => setFullName(e.target.value)} required disabled={isLoading} minLength={3} className="text-sm sm:text-base h-9 sm:h-10" />
                                 </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="signup-email">Email</Label>
-                                    <Input id="signup-email" type="email" placeholder="budi@email.com" value={email} onChange={(e) => setEmail(e.target.value)} required disabled={isLoading} />
-                                    <p className="text-xs text-muted-foreground">Username akan dibuat otomatis menggunakan bagian email sebelum @ dan 4 digit angka acak</p>
+                                <div className="space-y-1.5 sm:space-y-2">
+                                    <Label htmlFor="signup-email" className="text-xs sm:text-sm">Email</Label>
+                                    <Input id="signup-email" type="email" placeholder="budi@email.com" value={email} onChange={(e) => setEmail(e.target.value)} required disabled={isLoading} className="text-sm sm:text-base h-9 sm:h-10" />
+                                    <p className="text-[10px] sm:text-xs text-muted-foreground">Username akan dibuat otomatis menggunakan bagian email sebelum @ dan 4 digit angka acak</p>
                                 </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="signup-password">Kata Sandi</Label>
+                                <div className="space-y-1.5 sm:space-y-2">
+                                    <Label htmlFor="signup-password" className="text-xs sm:text-sm">Kata Sandi</Label>
                                     <div className="relative">
                                         <Input
                                             id="signup-password"
@@ -178,7 +177,7 @@ const Auth = () => {
                                             disabled={isLoading}
                                             pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
                                             title="Password harus memiliki minimal 8 karakter, mengandung huruf besar, huruf kecil, angka, dan karakter khusus"
-                                            className="pr-10"
+                                            className="pr-10 text-sm sm:text-base h-9 sm:h-10"
                                         />
                                         <button
                                             type="button"
@@ -188,14 +187,14 @@ const Auth = () => {
                                             disabled={isLoading}
                                             className="absolute inset-y-0 right-0 flex items-center pr-3"
                                         >
-                                            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                            {showPassword ? <EyeOff className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> : <Eye className="h-3.5 w-3.5 sm:h-4 sm:w-4" />}
                                         </button>
                                     </div>
                                 </div>
-                                <Button type="submit" className="w-full" disabled={isLoading}>
+                                <Button type="submit" className="w-full text-xs sm:text-sm h-9 sm:h-10 md:h-11" disabled={isLoading}>
                                     {isLoading ? (
                                         <>
-                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                            <Loader2 className="mr-1.5 sm:mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4 animate-spin" />
                                             Membuat Akun...
                                         </>
                                     ) : (
@@ -205,7 +204,7 @@ const Auth = () => {
                             </form>
                         </TabsContent>
                     </Tabs>
-                    <div className="mt-4 text-center text-sm">
+                    <div className="mt-3 sm:mt-4 text-center text-xs sm:text-sm">
                         <Link to="/" className="underline text-muted-foreground hover:text-primary transition-colors">
                             Kembali ke halaman utama
                         </Link>

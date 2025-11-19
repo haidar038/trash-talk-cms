@@ -109,6 +109,88 @@ export type Database = {
                     }
                 ];
             };
+            chat_history: {
+                Row: {
+                    id: string;
+                    user_id: string;
+                    message: string;
+                    response: string;
+                    created_at: string;
+                };
+                Insert: {
+                    id?: string;
+                    user_id: string;
+                    message: string;
+                    response: string;
+                    created_at?: string;
+                };
+                Update: {
+                    id?: string;
+                    user_id?: string;
+                    message?: string;
+                    response?: string;
+                    created_at?: string;
+                };
+                Relationships: [
+                    {
+                        foreignKeyName: "chat_history_user_id_fkey";
+                        columns: ["user_id"];
+                        isOneToOne: false;
+                        referencedRelation: "users";
+                        referencedColumns: ["id"];
+                    }
+                ];
+            };
+            gallery: {
+                Row: {
+                    id: string;
+                    user_id: string;
+                    title: string;
+                    description: string | null;
+                    media_url: string;
+                    thumbnail_url: string | null;
+                    media_type: "image" | "video";
+                    aspect_ratio: "portrait" | "landscape";
+                    views: number;
+                    created_at: string;
+                    updated_at: string;
+                };
+                Insert: {
+                    id?: string;
+                    user_id: string;
+                    title: string;
+                    description?: string | null;
+                    media_url: string;
+                    thumbnail_url?: string | null;
+                    media_type?: "image" | "video";
+                    aspect_ratio?: "portrait" | "landscape";
+                    views?: number;
+                    created_at?: string;
+                    updated_at?: string;
+                };
+                Update: {
+                    id?: string;
+                    user_id?: string;
+                    title?: string;
+                    description?: string | null;
+                    media_url?: string;
+                    thumbnail_url?: string | null;
+                    media_type?: "image" | "video";
+                    aspect_ratio?: "portrait" | "landscape";
+                    views?: number;
+                    created_at?: string;
+                    updated_at?: string;
+                };
+                Relationships: [
+                    {
+                        foreignKeyName: "gallery_user_id_fkey";
+                        columns: ["user_id"];
+                        isOneToOne: false;
+                        referencedRelation: "users";
+                        referencedColumns: ["id"];
+                    }
+                ];
+            };
         };
         Views: {
             [_ in never]: never;

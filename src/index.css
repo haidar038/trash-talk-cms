@@ -106,3 +106,56 @@ All colors MUST be HSL.
         @apply bg-background text-foreground;
     }
 }
+
+/* Infinite Scroll Animation for Waste Types */
+@keyframes scroll {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-50%);
+    }
+}
+
+.waste-scroll-container {
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    mask-image: linear-gradient(
+        to right,
+        transparent,
+        black 10%,
+        black 90%,
+        transparent
+    );
+    -webkit-mask-image: linear-gradient(
+        to right,
+        transparent,
+        black 10%,
+        black 90%,
+        transparent
+    );
+}
+
+.waste-scroll-track {
+    display: flex;
+    gap: 1.5rem;
+    animation: scroll 30s linear infinite;
+    width: fit-content;
+}
+
+.waste-scroll-track:hover {
+    animation-play-state: paused;
+}
+
+.waste-scroll-item {
+    flex: 0 0 320px;
+    min-width: 320px;
+}
+
+@media (max-width: 640px) {
+    .waste-scroll-item {
+        flex: 0 0 280px;
+        min-width: 280px;
+    }
+}

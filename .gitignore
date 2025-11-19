@@ -32,3 +32,8 @@ jspm_packages/
 
 # Security files
 .env
+
+# Claude Files & Folder
+.claude
+CLAUDE.md
+docs

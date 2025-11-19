@@ -165,32 +165,33 @@ const EditArticle = () => {
 
   if (isFetching) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      <div className="min-h-screen flex items-center justify-center px-4">
+        <Loader2 className="w-6 h-6 sm:w-8 sm:h-8 animate-spin text-primary" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-secondary/20 to-accent/10 p-4">
-      <div className="container mx-auto max-w-3xl py-8">
+    <div className="min-h-screen bg-gradient-to-br from-background via-secondary/20 to-accent/10 px-4 sm:px-6 md:px-8 py-6 sm:py-8 md:py-10">
+      <div className="container mx-auto max-w-2xl md:max-w-3xl lg:max-w-4xl">
         <Button
           variant="ghost"
+          size="sm"
           onClick={() => navigate("/dashboard")}
-          className="mb-6 gap-2"
+          className="mb-4 sm:mb-5 md:mb-6"
         >
-          <ArrowLeft className="w-4 h-4" />
-          Back to Dashboard
+          <ArrowLeft className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+          <span className="text-xs sm:text-sm">Back to Dashboard</span>
         </Button>
 
         <Card className="shadow-xl">
-          <CardHeader>
-            <CardTitle className="text-3xl">Edit Article</CardTitle>
+          <CardHeader className="p-4 sm:p-5 md:p-6">
+            <CardTitle className="text-xl sm:text-2xl md:text-3xl">Edit Article</CardTitle>
           </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="title">Title</Label>
+          <CardContent className="p-4 sm:p-5 md:p-6">
+            <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5 md:space-y-6">
+              <div className="space-y-1.5 sm:space-y-2">
+                <Label htmlFor="title" className="text-xs sm:text-sm">Title</Label>
                 <Input
                   id="title"
                   placeholder="Enter article title"
@@ -198,23 +199,24 @@ const EditArticle = () => {
                   onChange={(e) => setTitle(e.target.value)}
                   required
                   disabled={isLoading}
+                  className="text-sm sm:text-base"
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="category">Category</Label>
+              <div className="space-y-1.5 sm:space-y-2">
+                <Label htmlFor="category" className="text-xs sm:text-sm">Category</Label>
                 <Select
                   value={category}
                   onValueChange={setCategory}
                   required
                   disabled={isLoading}
                 >
-                  <SelectTrigger id="category">
+                  <SelectTrigger id="category" className="text-sm sm:text-base">
                     <SelectValue placeholder="Select a category" />
                   </SelectTrigger>
                   <SelectContent>
                     {CATEGORIES.map((cat) => (
-                      <SelectItem key={cat} value={cat}>
+                      <SelectItem key={cat} value={cat} className="text-sm sm:text-base">
                         {cat}
                       </SelectItem>
                     ))}
@@ -222,30 +224,30 @@ const EditArticle = () => {
                 </Select>
               </div>
 
-              <div className="space-y-2">
-                <Label>Article Image (Optional)</Label>
+              <div className="space-y-1.5 sm:space-y-2">
+                <Label className="text-xs sm:text-sm">Article Image (Optional)</Label>
                 {imagePreview || currentImageUrl ? (
                   <div className="relative">
                     <img
                       src={imagePreview || currentImageUrl || ''}
                       alt="Preview"
-                      className="w-full h-48 object-cover rounded-lg"
+                      className="w-full h-40 sm:h-48 md:h-56 object-cover rounded-lg"
                     />
                     <Button
                       type="button"
                       variant="destructive"
                       size="icon"
-                      className="absolute top-2 right-2"
+                      className="absolute top-1.5 right-1.5 sm:top-2 sm:right-2 h-7 w-7 sm:h-9 sm:w-9"
                       onClick={handleRemoveImage}
                     >
-                      <X className="h-4 w-4" />
+                      <X className="h-3 w-3 sm:h-4 sm:w-4" />
                     </Button>
                   </div>
                 ) : (
-                  <div className="border-2 border-dashed border-border rounded-lg p-8 text-center hover:border-primary/50 transition-colors">
-                    <Upload className="mx-auto h-12 w-12 text-muted-foreground mb-2" />
+                  <div className="border-2 border-dashed border-border rounded-lg p-6 sm:p-7 md:p-8 text-center hover:border-primary/50 transition-colors">
+                    <Upload className="mx-auto h-10 w-10 sm:h-11 sm:w-11 md:h-12 md:w-12 text-muted-foreground mb-1.5 sm:mb-2" />
                     <label className="cursor-pointer">
-                      <span className="text-sm text-primary hover:underline">
+                      <span className="text-xs sm:text-sm text-primary hover:underline">
                         Click to upload an image
                       </span>
                       <input
@@ -259,8 +261,8 @@ const EditArticle = () => {
                 )}
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="content">Content</Label>
+              <div className="space-y-1.5 sm:space-y-2">
+                <Label htmlFor="content" className="text-xs sm:text-sm">Content</Label>
                 <Textarea
                   id="content"
                   placeholder="Write your article content here..."
@@ -268,25 +270,25 @@ const EditArticle = () => {
                   onChange={(e) => setContent(e.target.value)}
                   required
                   disabled={isLoading}
-                  rows={12}
-                  className="resize-none"
+                  rows={10}
+                  className="resize-none text-sm sm:text-base"
                 />
               </div>
 
-              <div className="flex gap-3">
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={() => navigate("/dashboard")}
                   disabled={isLoading}
-                  className="flex-1"
+                  className="flex-1 text-xs sm:text-sm"
                 >
                   Cancel
                 </Button>
-                <Button type="submit" disabled={isLoading} className="flex-1">
+                <Button type="submit" disabled={isLoading} className="flex-1 text-xs sm:text-sm">
                   {isLoading ? (
                     <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      <Loader2 className="mr-1.5 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
                       Updating...
                     </>
                   ) : (

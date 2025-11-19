@@ -48,6 +48,14 @@ const Classification = () => {
     const user = useAuth().user;
     const { saveClassification } = useClassificationHistory(user?.id);
 
+    // Redirect to auth if not logged in
+    useEffect(() => {
+        if (!user) {
+            toast.error("Silakan login terlebih dahulu untuk menggunakan fitur klasifikasi");
+            navigate("/auth");
+        }
+    }, [user, navigate]);
+
     // Cleanup camera stream on unmount
     useEffect(() => {
         return () => {
@@ -275,80 +283,80 @@ const Classification = () => {
     };
 
     return (
-        <div className="container mx-auto px-4 py-8 max-w-4xl">
-            <div className="text-center mb-8">
-                <div className="flex items-center justify-center gap-4 mb-4">
-                    <h1 className="text-4xl font-bold">🌱 Klasifikasi Sampah dengan AI</h1>
+        <div className="container mx-auto px-4 sm:px-6 md:px-8 py-6 sm:py-8 md:py-10 max-w-3xl md:max-w-4xl lg:max-w-5xl">
+            <div className="text-center mb-6 sm:mb-7 md:mb-8">
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-3 sm:mb-4">
+                    <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold">🌱 Klasifikasi Sampah dengan AI</h1>
                     {user && (
-                        <Button variant="outline" size="sm" onClick={() => navigate("/classification/history")}>
-                            <History className="w-4 h-4 mr-2" />
-                            Lihat Riwayat
+                        <Button variant="outline" size="sm" onClick={() => navigate("/classification/history")} className="text-xs sm:text-sm">
+                            <History className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                            <span className="hidden sm:inline">Lihat </span>Riwayat
                         </Button>
                     )}
                 </div>
-                <p className="text-xl text-muted-foreground mb-2">Unggah gambar limbah untuk identifikasi otomatis menggunakan kecerdasan buatan (AI).</p>
-                <span className="inline-block bg-primary/10 text-primary text-sm px-3 py-1 rounded-full">⚡ Powered by Puter.js + OpenAI GPT-5-Nano</span>
+                <p className="text-sm sm:text-base md:text-lg lg:text-xl text-muted-foreground mb-2 sm:mb-3 px-4">Unggah gambar limbah untuk identifikasi otomatis menggunakan kecerdasan buatan (AI).</p>
+                <span className="inline-block bg-primary/10 text-primary text-xs sm:text-sm px-2 sm:px-3 py-1 rounded-full">⚡ Powered by Puter.js + OpenAI GPT-5-Nano</span>
             </div>
 
-            <Card className="mb-8">
-                <CardContent className="pt-6">
-                    <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-8 text-center hover:border-primary/50 transition-colors" onDragOver={(e) => e.preventDefault()} onDrop={onDrop}>
+            <Card className="mb-6 sm:mb-7 md:mb-8">
+                <CardContent className="pt-4 sm:pt-5 md:pt-6">
+                    <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-4 sm:p-6 md:p-8 text-center hover:border-primary/50 transition-colors" onDragOver={(e) => e.preventDefault()} onDrop={onDrop}>
                         {imageDataUrl ? (
-                            <div className="space-y-4">
-                                <img src={imageDataUrl} alt="Preview" className="max-h-64 mx-auto rounded-lg shadow-md" />
+                            <div className="space-y-3 sm:space-y-4">
+                                <img src={imageDataUrl} alt="Preview" className="max-h-48 sm:max-h-56 md:max-h-64 lg:max-h-80 mx-auto rounded-lg shadow-md" />
                                 <div className="flex flex-col sm:flex-row justify-center gap-2">
-                                    <Button onClick={analyzeImage} disabled={loading} className="w-full sm:w-auto">
+                                    <Button onClick={analyzeImage} disabled={loading} className="w-full sm:w-auto text-sm sm:text-base">
                                         {loading ? (
                                             <>
-                                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                                Mengidentifikasi...
+                                                <Loader2 className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
+                                                <span className="text-xs sm:text-sm">Mengidentifikasi...</span>
                                             </>
                                         ) : (
                                             <>
-                                                <ImageIcon className="mr-2 h-4 w-4" />
-                                                Identifikasi Gambar
+                                                <ImageIcon className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+                                                <span className="text-xs sm:text-sm">Identifikasi Gambar</span>
                                             </>
                                         )}
                                     </Button>
-                                    <Button variant="outline" onClick={resetUpload} className="w-full sm:w-auto">
-                                        <X className="mr-2 h-4 w-4" />
-                                        Hapus
+                                    <Button variant="outline" onClick={resetUpload} className="w-full sm:w-auto text-sm sm:text-base">
+                                        <X className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+                                        <span className="text-xs sm:text-sm">Hapus</span>
                                     </Button>
                                 </div>
                             </div>
                         ) : isCameraActive ? (
-                            <div className="space-y-4">
-                                <video ref={videoRef} autoPlay playsInline muted className="w-full max-h-96 rounded-lg shadow-md bg-black" />
+                            <div className="space-y-3 sm:space-y-4">
+                                <video ref={videoRef} autoPlay playsInline muted className="w-full max-h-64 sm:max-h-80 md:max-h-96 rounded-lg shadow-md bg-black" />
                                 <div className="flex flex-col sm:flex-row justify-center gap-2">
-                                    <Button onClick={captureImage} className="w-full sm:w-auto">
-                                        <Camera className="mr-2 h-4 w-4" />
+                                    <Button onClick={captureImage} className="w-full sm:w-auto text-xs sm:text-sm">
+                                        <Camera className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
                                         Ambil Gambar
                                     </Button>
                                     {isFlashlightSupported && (
-                                        <Button variant="outline" onClick={toggleFlashlight} className="w-full sm:w-auto">
-                                            <Zap className={`mr-2 h-4 w-4 ${isFlashlightOn ? "text-yellow-400" : ""}`} />
-                                            {isFlashlightOn ? "Matikan Senter" : "Nyalakan Senter"}
+                                        <Button variant="outline" onClick={toggleFlashlight} className="w-full sm:w-auto text-xs sm:text-sm">
+                                            <Zap className={`mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4 ${isFlashlightOn ? "text-yellow-400" : ""}`} />
+                                            <span className="hidden sm:inline">{isFlashlightOn ? "Matikan" : "Nyalakan"} </span>Senter
                                         </Button>
                                     )}
-                                    <Button variant="outline" onClick={stopCamera} className="w-full sm:w-auto">
-                                        <X className="mr-2 h-4 w-4" />
+                                    <Button variant="outline" onClick={stopCamera} className="w-full sm:w-auto text-xs sm:text-sm">
+                                        <X className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
                                         Batal
                                     </Button>
                                 </div>
                             </div>
                         ) : (
-                            <div className="space-y-4">
+                            <div className="space-y-3 sm:space-y-4">
                                 <div className="flex flex-col sm:flex-row justify-center gap-2">
-                                    <Button className="w-full sm:flex-1 sm:max-w-xs" onClick={() => fileInputRef.current?.click()}>
-                                        <Upload className="mr-2 h-4 w-4" />
+                                    <Button className="w-full sm:flex-1 sm:max-w-xs text-xs sm:text-sm" onClick={() => fileInputRef.current?.click()}>
+                                        <Upload className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
                                         Unggah Gambar
                                     </Button>
-                                    <Button className="w-full sm:flex-1 sm:max-w-xs" variant="outline" onClick={startCamera}>
-                                        <Camera className="mr-2 h-4 w-4" />
+                                    <Button className="w-full sm:flex-1 sm:max-w-xs text-xs sm:text-sm" variant="outline" onClick={startCamera}>
+                                        <Camera className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
                                         Buka Kamera
                                     </Button>
                                 </div>
-                                <p className="text-sm text-muted-foreground">Atau seret & lepas gambar di sini</p>
+                                <p className="text-xs sm:text-sm text-muted-foreground">Atau seret & lepas gambar di sini</p>
                             </div>
                         )}
                         <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={(e) => e.target.files && handleFile(e.target.files[0])} />
@@ -357,10 +365,10 @@ const Classification = () => {
             </Card>
 
             {error && (
-                <Card className="mb-8 border-destructive">
-                    <CardContent className="pt-6">
-                        <div className="flex items-center gap-2 text-destructive">
-                            <AlertCircle className="h-5 w-5 flex-shrink-0" />
+                <Card className="mb-6 sm:mb-7 md:mb-8 border-destructive">
+                    <CardContent className="pt-4 sm:pt-5 md:pt-6">
+                        <div className="flex items-start sm:items-center gap-2 text-destructive text-sm sm:text-base">
+                            <AlertCircle className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0 mt-0.5 sm:mt-0" />
                             <p>{error}</p>
                         </div>
                     </CardContent>
@@ -368,34 +376,34 @@ const Classification = () => {
             )}
 
             {results && !error && (
-                <div className="space-y-6">
-                    <h2 className="text-2xl font-bold">📊 Hasil Identifikasi</h2>
+                <div className="space-y-4 sm:space-y-5 md:space-y-6">
+                    <h2 className="text-xl sm:text-2xl md:text-3xl font-bold">📊 Hasil Identifikasi</h2>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5 md:gap-6">
                         {/* Left Column - Waste Information */}
-                        <div className="space-y-6">
+                        <div className="space-y-4 sm:space-y-5 md:space-y-6">
                             {results.waste_types.map((waste, index) => (
                                 <Card key={index}>
-                                    <CardContent className="pt-6">
-                                        <h3 className="text-xl font-semibold mb-4 first-letter:uppercase">{waste.name}</h3>
-                                        <div className="flex flex-wrap gap-2 mb-4">
-                                            <span className={`px-3 py-1 rounded-full text-sm ${getCategoryClass(waste.category)}`}>{waste.category}</span>
-                                            <span className={`px-3 py-1 rounded-full text-sm ${waste.recyclable ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
-                                                {waste.recyclable ? "♻️ Dapat didaur ulang" : "🚫 Tidak dapat didaur ulang"}
+                                    <CardContent className="pt-4 sm:pt-5 md:pt-6">
+                                        <h3 className="text-lg sm:text-xl md:text-2xl font-semibold mb-3 sm:mb-4 first-letter:uppercase">{waste.name}</h3>
+                                        <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-3 sm:mb-4">
+                                            <span className={`px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm ${getCategoryClass(waste.category)}`}>{waste.category}</span>
+                                            <span className={`px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm ${waste.recyclable ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
+                                                {waste.recyclable ? "♻️ " : "🚫 "}<span className="hidden sm:inline">{waste.recyclable ? "Dapat didaur ulang" : "Tidak dapat didaur ulang"}</span><span className="sm:hidden">Daur ulang</span>
                                             </span>
-                                            <span className="px-3 py-1 rounded-full text-sm bg-gray-100 text-gray-800">📊 {waste.percentage}% yakin</span>
+                                            <span className="px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm bg-gray-100 text-gray-800">📊 {waste.percentage}%</span>
                                         </div>
-                                        <p className="mb-4">
+                                        <p className="mb-3 sm:mb-4 text-sm sm:text-base">
                                             <strong>⚠ Catatan Daur Ulang:</strong> <span className="inline-block text-muted-foreground first-letter:uppercase">{waste.recycle_reason}</span>
                                         </p>
-                                        <p>
+                                        <p className="text-sm sm:text-base">
                                             <strong>⏱️ Waktu Penguraian:</strong> <span className="inline-block text-muted-foreground first-letter:uppercase">{waste.decomposition_time}</span>
                                         </p>
 
                                         {waste.materials && waste.materials.length > 0 && (
-                                            <div className="mt-4 flex flex-wrap gap-2">
-                                                <p className="font-bold">🔍 Rincian Material:</p>
-                                                <Badge variant="outline">
+                                            <div className="mt-3 sm:mt-4 flex flex-wrap gap-2">
+                                                <p className="font-bold text-sm sm:text-base">🔍 Rincian Material:</p>
+                                                <Badge variant="outline" className="text-xs sm:text-sm">
                                                     {waste.materials.map((material, idx) => (
                                                         <div key={idx} className="capitalize">
                                                             {material.type}: {material.percentage}%
@@ -410,27 +418,27 @@ const Classification = () => {
 
                             {results.overall_assessment && (
                                 <Card>
-                                    <CardContent className="pt-6">
-                                        <h3 className="text-xl font-semibold mb-2">📝 Penilaian Umum</h3>
-                                        <p className="text-muted-foreground">{results.overall_assessment}</p>
+                                    <CardContent className="pt-4 sm:pt-5 md:pt-6">
+                                        <h3 className="text-lg sm:text-xl md:text-2xl font-semibold mb-2 sm:mb-3">📝 Penilaian Umum</h3>
+                                        <p className="text-muted-foreground text-sm sm:text-base">{results.overall_assessment}</p>
                                     </CardContent>
                                 </Card>
                             )}
 
                             {results.environmental_impact && (
                                 <Card className="border-l-4 border-l-yellow-500">
-                                    <CardContent className="pt-6">
-                                        <h3 className="text-xl font-semibold mb-2">🌍 Dampak Lingkungan</h3>
-                                        <p className="text-muted-foreground">{results.environmental_impact}</p>
+                                    <CardContent className="pt-4 sm:pt-5 md:pt-6">
+                                        <h3 className="text-lg sm:text-xl md:text-2xl font-semibold mb-2 sm:mb-3">🌍 Dampak Lingkungan</h3>
+                                        <p className="text-muted-foreground text-sm sm:text-base">{results.environmental_impact}</p>
                                     </CardContent>
                                 </Card>
                             )}
 
                             {results.disposal_recommendations && results.disposal_recommendations.length > 0 && (
                                 <Card>
-                                    <CardContent className="pt-6">
-                                        <h3 className="text-xl font-semibold mb-2">💡 Rekomendasi Pembuangan</h3>
-                                        <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+                                    <CardContent className="pt-4 sm:pt-5 md:pt-6">
+                                        <h3 className="text-lg sm:text-xl md:text-2xl font-semibold mb-2 sm:mb-3">💡 Rekomendasi Pembuangan</h3>
+                                        <ul className="list-disc list-inside space-y-1.5 sm:space-y-2 text-muted-foreground text-sm sm:text-base">
                                             {results.disposal_recommendations.map((rec, index) => (
                                                 <li key={index}>{rec}</li>
                                             ))}
@@ -443,9 +451,9 @@ const Classification = () => {
                         {/* Right Column - Chart */}
                         <div className="lg:sticky lg:top-6 h-fit">
                             <Card>
-                                <CardContent className="pt-6">
-                                    <h3 className="text-xl font-semibold mb-4">📈 Komposisi Sampah</h3>
-                                    <div className="w-full max-w-[400px] mx-auto">
+                                <CardContent className="pt-4 sm:pt-5 md:pt-6">
+                                    <h3 className="text-lg sm:text-xl md:text-2xl font-semibold mb-3 sm:mb-4">📈 Komposisi Sampah</h3>
+                                    <div className="w-full max-w-[300px] sm:max-w-[400px] mx-auto">
                                         <Pie
                                             data={{
                                                 labels: results.waste_types.map((w) => w.name),
