@@ -75,14 +75,14 @@ const Navbar = () => {
                                 <NavigationMenuItem>
                                     <NavigationMenuLink className={navigationMenuTriggerStyle()} onClick={() => navigate("/about")} style={{ cursor: "pointer" }}>
                                         <Info className="w-4 h-4 mr-2" />
-                                        About
+                                        Tentang
                                     </NavigationMenuLink>
                                 </NavigationMenuItem>
 
                                 <NavigationMenuItem>
                                     <NavigationMenuLink className={navigationMenuTriggerStyle()} onClick={() => navigate("/#contact")} style={{ cursor: "pointer" }}>
                                         <Mail className="w-4 h-4 mr-2" />
-                                        Contact
+                                        Hubungi Kami
                                     </NavigationMenuLink>
                                 </NavigationMenuItem>
                             </NavigationMenuList>

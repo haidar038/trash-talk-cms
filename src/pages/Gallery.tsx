@@ -83,16 +83,16 @@ const Gallery = () => {
                 {filteredItems && filteredItems.length > 0 ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 md:gap-6">
                         {filteredItems.map((item) => (
-                            <Card key={item.id} className={`cursor-pointer hover:shadow-lg transition-all group overflow-hidden ${item.aspect_ratio === "portrait" ? "row-span-2" : ""}`} onClick={() => handleItemClick(item)}>
+                            <Card key={item.id} className="cursor-pointer hover:shadow-lg transition-all group overflow-hidden" onClick={() => handleItemClick(item)}>
                                 <div className="relative overflow-hidden bg-black">
                                     {item.thumbnail_url || item.media_type === "image" ? (
                                         <img
                                             src={item.thumbnail_url || item.media_url}
                                             alt={item.title}
-                                            className={`w-full object-cover group-hover:scale-105 transition-transform ${item.aspect_ratio === "portrait" ? "aspect-[9/16]" : "aspect-video"}`}
+                                            className="w-full aspect-square object-cover group-hover:scale-105 transition-transform"
                                         />
                                     ) : (
-                                        <div className={`w-full bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center ${item.aspect_ratio === "portrait" ? "aspect-[9/16]" : "aspect-video"}`}>
+                                        <div className="w-full aspect-square bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
                                             {item.media_type === "video" ? <Play className="h-16 w-16 text-muted-foreground" /> : <ImageIcon className="h-16 w-16 text-muted-foreground" />}
                                         </div>
                                     )}
