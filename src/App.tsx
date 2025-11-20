@@ -36,8 +36,8 @@ const App = () => (
             <PuterProvider />
             <Toaster />
             <Sonner />
-            <CookieConsent />
             <BrowserRouter>
+                <CookieConsent />
                 <Routes>
                     <Route element={<Layout />}>
                         <Route path="/" element={<Index />} />
