@@ -33,12 +33,10 @@ const CreateGalleryItem = () => {
 
             // Upload media file
             const mediaFileName = `${user.id}/${Date.now()}-${mediaFile.name}`;
-            const { data: mediaData, error: mediaError } = await supabase.storage
-                .from("gallery")
-                .upload(mediaFileName, mediaFile, {
-                    cacheControl: "3600",
-                    upsert: false,
-                });
+            const { data: mediaData, error: mediaError } = await supabase.storage.from("gallery").upload(mediaFileName, mediaFile, {
+                cacheControl: "3600",
+                upsert: false,
+            });
 
             if (mediaError) throw mediaError;
 
@@ -49,12 +47,10 @@ const CreateGalleryItem = () => {
             // Upload thumbnail if provided (optional for videos, not needed for images)
             if (thumbnailFile) {
                 const thumbnailFileName = `${user.id}/${Date.now()}-thumb-${thumbnailFile.name}`;
-                const { data: thumbData, error: thumbError } = await supabase.storage
-                    .from("gallery")
-                    .upload(thumbnailFileName, thumbnailFile, {
-                        cacheControl: "3600",
-                        upsert: false,
-                    });
+                const { data: thumbData, error: thumbError } = await supabase.storage.from("gallery").upload(thumbnailFileName, thumbnailFile, {
+                    cacheControl: "3600",
+                    upsert: false,
+                });
 
                 if (thumbError) throw thumbError;
 
@@ -76,11 +72,11 @@ const CreateGalleryItem = () => {
             if (dbError) throw dbError;
         },
         onSuccess: () => {
-            toast.success("Gallery item uploaded successfully");
+            toast.success("Item galeri berhasil diunggah!");
             navigate("/admin/gallery");
         },
         onError: (error: Error) => {
-            toast.error(error.message || "Failed to upload gallery item");
+            toast.error(error.message || "Gagal mengunggah item galeri");
             setIsUploading(false);
         },
     });
@@ -88,11 +84,11 @@ const CreateGalleryItem = () => {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (!title.trim()) {
-            toast.error("Please enter a title");
+            toast.error("Mohon masukkan judul");
             return;
         }
         if (!mediaFile) {
-            toast.error("Please select a media file");
+            toast.error("Mohon pilih sebuah file media");
             return;
         }
         createMutation.mutate();
@@ -103,106 +99,77 @@ const CreateGalleryItem = () => {
             <div className="container mx-auto px-4 py-8 max-w-3xl">
                 <Button variant="ghost" onClick={() => navigate("/admin/gallery")} className="mb-6">
                     <ArrowLeft className="mr-2 h-4 w-4" />
-                    Back to Gallery
+                    Kembali ke Galeri
                 </Button>
 
                 <Card>
                     <CardHeader>
-                        <CardTitle className="text-2xl">Upload New Gallery Item</CardTitle>
+                        <CardTitle className="text-2xl">Unggah Item Galeri Baru</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <form onSubmit={handleSubmit} className="space-y-6">
                             <div className="space-y-2">
-                                <Label htmlFor="title">Title *</Label>
-                                <Input
-                                    id="title"
-                                    value={title}
-                                    onChange={(e) => setTitle(e.target.value)}
-                                    placeholder="Enter title"
-                                    required
-                                />
+                                <Label htmlFor="title">Judul *</Label>
+                                <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Masukkan judul" required />
                             </div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="description">Description</Label>
-                                <Textarea
-                                    id="description"
-                                    value={description}
-                                    onChange={(e) => setDescription(e.target.value)}
-                                    placeholder="Enter description"
-                                    rows={4}
-                                />
+                                <Label htmlFor="description">Deksripsi</Label>
+                                <Textarea id="description" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Masukkan deskripsi" rows={4} />
                             </div>
 
                             <div className="space-y-2">
-                                <Label>Media Type *</Label>
+                                <Label>Jenis Media *</Label>
                                 <RadioGroup value={mediaType} onValueChange={(value: any) => setMediaType(value)}>
                                     <div className="flex items-center space-x-2">
                                         <RadioGroupItem value="image" id="image" />
                                         <Label htmlFor="image" className="cursor-pointer">
-                                            Image - Photos, illustrations, graphics
+                                            Gambar - Foto, ilustrasi, grafis
                                         </Label>
                                     </div>
                                     <div className="flex items-center space-x-2">
                                         <RadioGroupItem value="video" id="video" />
                                         <Label htmlFor="video" className="cursor-pointer">
-                                            Video - Video clips, animations
+                                            Video - Klip video, animasi
                                         </Label>
                                     </div>
                                 </RadioGroup>
                             </div>
 
                             <div className="space-y-2">
-                                <Label>Aspect Ratio *</Label>
+                                <Label>Aspek Rasio *</Label>
                                 <RadioGroup value={aspectRatio} onValueChange={(value: any) => setAspectRatio(value)}>
                                     <div className="flex items-center space-x-2">
                                         <RadioGroupItem value="portrait" id="portrait" />
                                         <Label htmlFor="portrait" className="cursor-pointer">
-                                            Portrait (9:16) - Recommended for mobile content
+                                            Portrait (9:16) - Direkomendasikan untuk konten mobile
                                         </Label>
                                     </div>
                                     <div className="flex items-center space-x-2">
                                         <RadioGroupItem value="landscape" id="landscape" />
                                         <Label htmlFor="landscape" className="cursor-pointer">
-                                            Landscape (16:9) - Standard format
+                                            Landscape (16:9) - Format standar
                                         </Label>
                                     </div>
                                 </RadioGroup>
                             </div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="media">
-                                    {mediaType === "image" ? "Image File *" : "Video File *"}
-                                </Label>
-                                <Input
-                                    id="media"
-                                    type="file"
-                                    accept={mediaType === "image" ? "image/*" : "video/*"}
-                                    onChange={(e) => setMediaFile(e.target.files?.[0] || null)}
-                                    required
-                                />
+                                <Label htmlFor="media">{mediaType === "image" ? "File Gambar *" : "File Vide *"}</Label>
+                                <Input id="media" type="file" accept={mediaType === "image" ? "image/*" : "video/*"} onChange={(e) => setMediaFile(e.target.files?.[0] || null)} required />
                                 {mediaFile && (
                                     <p className="text-sm text-muted-foreground">
-                                        Selected: {mediaFile.name} ({(mediaFile.size / 1024 / 1024).toFixed(2)} MB)
+                                        Dipilih: {mediaFile.name} ({(mediaFile.size / 1024 / 1024).toFixed(2)} MB)
                                     </p>
                                 )}
                             </div>
 
                             {mediaType === "video" && (
                                 <div className="space-y-2">
-                                    <Label htmlFor="thumbnail">Thumbnail Image (Optional)</Label>
-                                    <p className="text-xs text-muted-foreground">
-                                        Upload a custom thumbnail for your video
-                                    </p>
-                                    <Input
-                                        id="thumbnail"
-                                        type="file"
-                                        accept="image/*"
-                                        onChange={(e) => setThumbnailFile(e.target.files?.[0] || null)}
-                                    />
-                                    {thumbnailFile && (
-                                        <p className="text-sm text-muted-foreground">Selected: {thumbnailFile.name}</p>
-                                    )}
+                                    <Label htmlFor="thumbnail">Gambar Thumbnail (Opsional)</Label>
+                                    <p className="text-xs text-muted-foreground">Upload a custom thumbnail for your video</p>
+                                    <Input id="thumbnail" type="file" accept="image/*" onChange={(e) => setThumbnailFile(e.target.files?.[0] || null)} />
+                                    {thumbnailFile && <p className="text-sm text-muted-foreground">Dipilih: {thumbnailFile.name}</p>}
                                 </div>
                             )}
 
@@ -211,22 +178,17 @@ const CreateGalleryItem = () => {
                                     {isUploading ? (
                                         <>
                                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                            Uploading...
+                                            Mengunggah...
                                         </>
                                     ) : (
                                         <>
                                             <Upload className="mr-2 h-4 w-4" />
-                                            Upload
+                                            Unggah
                                         </>
                                     )}
                                 </Button>
-                                <Button
-                                    type="button"
-                                    variant="outline"
-                                    onClick={() => navigate("/admin/gallery")}
-                                    disabled={isUploading}
-                                >
-                                    Cancel
+                                <Button type="button" variant="outline" onClick={() => navigate("/admin/gallery")} disabled={isUploading}>
+                                    Batal
                                 </Button>
                             </div>
                         </form>

@@ -52,7 +52,7 @@ const Gallery = () => {
     if (isLoading) {
         return (
             <div className="min-h-screen bg-gradient-to-br from-background via-secondary/30 to-accent/20 flex items-center justify-center px-4">
-                <p className="text-base sm:text-lg">Loading gallery...</p>
+                <p className="text-base sm:text-lg">Memuat galeri...</p>
             </div>
         );
     }
@@ -61,21 +61,21 @@ const Gallery = () => {
         <div className="min-h-screen bg-gradient-to-br from-background via-secondary/30 to-accent/20">
             <div className="container mx-auto px-4 sm:px-6 md:px-8 py-6 sm:py-8 md:py-10">
                 <div className="mb-6 sm:mb-7 md:mb-8">
-                    <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-1 sm:mb-2">Media Gallery</h1>
-                    <p className="text-muted-foreground mb-3 sm:mb-4 text-sm sm:text-base">Explore our collection of images and videos</p>
+                    <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-1 sm:mb-2">Galeri Media</h1>
+                    <p className="text-muted-foreground mb-3 sm:mb-4 text-sm sm:text-base">Jelajahi koleksi gambar dan video kami</p>
 
                     {/* Filter Buttons */}
                     <div className="flex flex-wrap gap-2">
                         <Button variant={filter === "all" ? "default" : "outline"} size="sm" onClick={() => setFilter("all")} className="text-xs sm:text-sm">
-                            All Media
+                            Semua Media
                         </Button>
                         <Button variant={filter === "image" ? "default" : "outline"} size="sm" onClick={() => setFilter("image")} className="text-xs sm:text-sm">
                             <ImageIcon className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-                            Images
+                            Gambar
                         </Button>
                         <Button variant={filter === "video" ? "default" : "outline"} size="sm" onClick={() => setFilter("video")} className="text-xs sm:text-sm">
                             <VideoIcon className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-                            Videos
+                            Video
                         </Button>
                     </div>
                 </div>
@@ -86,11 +86,7 @@ const Gallery = () => {
                             <Card key={item.id} className="cursor-pointer hover:shadow-lg transition-all group overflow-hidden" onClick={() => handleItemClick(item)}>
                                 <div className="relative overflow-hidden bg-black">
                                     {item.thumbnail_url || item.media_type === "image" ? (
-                                        <img
-                                            src={item.thumbnail_url || item.media_url}
-                                            alt={item.title}
-                                            className="w-full aspect-square object-cover group-hover:scale-105 transition-transform"
-                                        />
+                                        <img src={item.thumbnail_url || item.media_url} alt={item.title} className="w-full aspect-square object-cover group-hover:scale-105 transition-transform" />
                                     ) : (
                                         <div className="w-full aspect-square bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
                                             {item.media_type === "video" ? <Play className="h-16 w-16 text-muted-foreground" /> : <ImageIcon className="h-16 w-16 text-muted-foreground" />}

@@ -119,12 +119,7 @@ const Dashboard = () => {
                         <p className="text-muted-foreground mb-3 sm:mb-4 text-sm sm:text-base">Kelola artikel edukasi tentang pengolahan sampah</p>
                         <div className="relative w-full sm:max-w-sm md:max-w-md">
                             <Search className="absolute left-2.5 sm:left-3 top-2.5 sm:top-3 h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground" />
-                            <Input
-                                placeholder="Search your articles..."
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                className="pl-8 sm:pl-10 text-sm sm:text-base h-9 sm:h-10"
-                            />
+                            <Input placeholder="Cari artikel anda..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-8 sm:pl-10 text-sm sm:text-base h-9 sm:h-10" />
                         </div>
                     </div>
                     <div className="lg:mt-0">
@@ -187,7 +182,9 @@ const Dashboard = () => {
                     </AlertDialogHeader>
                     <AlertDialogFooter className="flex-col sm:flex-row gap-2 sm:gap-0">
                         <AlertDialogCancel className="text-xs sm:text-sm w-full sm:w-auto">Batal</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleDelete} className="text-xs sm:text-sm w-full sm:w-auto">Hapus</AlertDialogAction>
+                        <AlertDialogAction onClick={handleDelete} className="text-xs sm:text-sm w-full sm:w-auto">
+                            Hapus
+                        </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>

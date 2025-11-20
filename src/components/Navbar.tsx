@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Home, LogOut, BookOpen, Image as ImageIcon, User as UserIcon, LayoutDashboard, History, Images, Bot, Mail, Info } from "lucide-react";
+import { Home, LogOut, BookOpen, Image as ImageIcon, Camera, User as UserIcon, LayoutDashboard, History, Images, Bot, Mail, Info } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -45,20 +45,20 @@ const Navbar = () => {
                                             <li className="row-span-3">
                                                 <NavigationMenuLink asChild>
                                                     <div
-                                                        onClick={() => navigate("/articles")}
+                                                        onClick={() => navigate("/classification")}
                                                         className="flex h-full w-full select-none border flex-col justify-end rounded-md p-6 no-underline outline-none focus:shadow-md cursor-pointer hover:bg-accent hover:text-accent-foreground transition-colors group"
                                                     >
-                                                        <BookOpen className="h-6 w-6" />
-                                                        <div className="mb-2 mt-4 text-lg font-medium">Edukasi</div>
-                                                        <p className="text-sm leading-tight text-muted-foreground group-hover:text-white">Baca artikel edukatif tentang pengelolaan sampah dan lingkungan</p>
+                                                        <Camera className="h-6 w-6" />
+                                                        <div className="mb-2 mt-4 text-lg font-medium">Identifikasi</div>
+                                                        <p className="text-sm leading-tight text-muted-foreground group-hover:text-white">Klasifikasi jenis sampah dengan AI melalui live camera atau upload gambar</p>
                                                     </div>
                                                 </NavigationMenuLink>
                                             </li>
                                             <ListItem onClick={() => navigate("/gallery")} title="Galeri" icon={<Images className="h-4 w-4 mr-2" />}>
                                                 Lihat koleksi gambar dan video edukasi
                                             </ListItem>
-                                            <ListItem onClick={() => navigate("/classification")} title="Identifikasi" icon={<ImageIcon className="h-4 w-4 mr-2" />}>
-                                                Klasifikasi jenis sampah dengan AI
+                                            <ListItem onClick={() => navigate("/articles")} title="Edukasi" icon={<BookOpen className="h-4 w-4 mr-2" />}>
+                                                Baca artikel edukatif tentang pengelolaan sampah dan lingkungan
                                             </ListItem>
                                             {user && (
                                                 <ListItem onClick={() => navigate("/classification/history")} title="Riwayat" icon={<History className="h-4 w-4 mr-2" />}>

@@ -15,7 +15,7 @@ export function EditorToolbar({ editor }: Props) {
     }
 
     return (
-        <div className="border border-input bg-transparent rounded-md p-1 flex flex-wrap gap-1">
+        <div className="border border-input bg-transparent rounded-t-md p-1 flex flex-wrap gap-1">
             <Toggle size="sm" pressed={editor.isActive("heading", { level: 1 })} onPressedChange={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}>
                 <Heading1 className="h-4 w-4" />
             </Toggle>

@@ -11,7 +11,7 @@ import { Loader2, ArrowLeft, Upload, X } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RichTextEditor } from "@/components/RichTextEditor";
 
-const CATEGORIES = ["Recycling", "Composting", "Waste Reduction", "E-Waste", "Hazardous Waste", "Industrial Waste", "Zero Waste", "Sustainability"];
+const CATEGORIES = ["Daur Ulang", "Pengomposan", "Pengurangan Sampah", "Sampah Elektronik", "Limbah Berbahaya", "Lombah Industri", "Zero Waste", "Keberlanjutan"];
 
 const CreateArticle = () => {
     const navigate = useNavigate();
@@ -59,7 +59,7 @@ const CreateArticle = () => {
         e.preventDefault();
         // Konten Tiptap yang kosong bisa berupa string kosong atau '<p></p>'
         if (content.trim() === "" || content.trim() === "<p></p>") {
-            toast.error("Article content is required.");
+            toast.error("Isi artikel diwajibkan.");
             return;
         }
 
@@ -71,7 +71,7 @@ const CreateArticle = () => {
             } = await supabase.auth.getUser();
 
             if (!user) {
-                toast.error("You must be logged in to create articles");
+                toast.error("Anda harus masuk untuk membuat artikel.");
                 navigate("/auth");
                 return;
             }
@@ -120,25 +120,29 @@ const CreateArticle = () => {
             <div className="container mx-auto max-w-2xl md:max-w-3xl lg:max-w-4xl">
                 <Button variant="ghost" size="sm" onClick={() => navigate("/dashboard")} className="mb-4 sm:mb-5 md:mb-6">
                     <ArrowLeft className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-                    <span className="text-xs sm:text-sm">Back to Dashboard</span>
+                    <span className="text-xs sm:text-sm">Kembali ke Dashboard</span>
                 </Button>
 
                 <Card className="shadow-xl">
                     <CardHeader className="p-4 sm:p-5 md:p-6">
-                        <CardTitle className="text-xl sm:text-2xl md:text-3xl">Create New Article</CardTitle>
+                        <CardTitle className="text-xl sm:text-2xl md:text-3xl">Buat Artikel Baru</CardTitle>
                     </CardHeader>
                     <CardContent className="p-4 sm:p-5 md:p-6">
                         <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5 md:space-y-6">
                             <div className="space-y-1.5 sm:space-y-2">
-                                <Label htmlFor="title" className="text-xs sm:text-sm">Title</Label>
-                                <Input id="title" placeholder="Enter article title" value={title} onChange={(e) => setTitle(e.target.value)} required disabled={isLoading} className="text-sm sm:text-base" />
+                                <Label htmlFor="title" className="text-xs sm:text-sm">
+                                    Judul
+                                </Label>
+                                <Input id="title" placeholder="Masukkan judul artikel" value={title} onChange={(e) => setTitle(e.target.value)} required disabled={isLoading} className="text-sm sm:text-base" />
                             </div>
 
                             <div className="space-y-1.5 sm:space-y-2">
-                                <Label htmlFor="category" className="text-xs sm:text-sm">Category</Label>
+                                <Label htmlFor="category" className="text-xs sm:text-sm">
+                                    Kategori
+                                </Label>
                                 <Select value={category} onValueChange={setCategory} required disabled={isLoading}>
                                     <SelectTrigger id="category" className="text-sm sm:text-base">
-                                        <SelectValue placeholder="Select a category" />
+                                        <SelectValue placeholder="Pilih sebuah kategori" />
                                     </SelectTrigger>
                                     <SelectContent>
                                         {CATEGORIES.map((cat) => (
@@ -151,7 +155,7 @@ const CreateArticle = () => {
                             </div>
 
                             <div className="space-y-1.5 sm:space-y-2">
-                                <Label className="text-xs sm:text-sm">Article Image (Optional)</Label>
+                                <Label className="text-xs sm:text-sm">Gambar Artikel (Opsional)</Label>
                                 {imagePreview ? (
                                     <div className="relative">
                                         <img src={imagePreview} alt="Preview" className="w-full h-40 sm:h-48 md:h-56 object-cover rounded-lg" />
@@ -163,7 +167,7 @@ const CreateArticle = () => {
                                     <div className="border-2 border-dashed border-border rounded-lg p-6 sm:p-7 md:p-8 text-center hover:border-primary/50 transition-colors">
                                         <Upload className="mx-auto h-10 w-10 sm:h-11 sm:w-11 md:h-12 md:w-12 text-muted-foreground mb-1.5 sm:mb-2" />
                                         <label className="cursor-pointer">
-                                            <span className="text-xs sm:text-sm text-primary hover:underline">Click to upload an image</span>
+                                            <span className="text-xs sm:text-sm text-primary hover:underline">Klik untuk mengunggah sebuah gambar</span>
                                             <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
                                         </label>
                                     </div>
@@ -171,22 +175,24 @@ const CreateArticle = () => {
                             </div>
 
                             <div className="space-y-1.5 sm:space-y-2">
-                                <Label htmlFor="content" className="text-xs sm:text-sm">Content</Label>
+                                <Label htmlFor="content" className="text-xs sm:text-sm">
+                                    Isi
+                                </Label>
                                 <RichTextEditor initialContent={content} onChange={setContent} disabled={isLoading} />
                             </div>
 
                             <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
                                 <Button type="button" variant="outline" onClick={() => navigate("/dashboard")} disabled={isLoading} className="flex-1 text-xs sm:text-sm">
-                                    Cancel
+                                    Batal
                                 </Button>
                                 <Button type="submit" disabled={isLoading} className="flex-1 text-xs sm:text-sm">
                                     {isLoading ? (
                                         <>
                                             <Loader2 className="mr-1.5 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
-                                            Creating...
+                                            Membuat...
                                         </>
                                     ) : (
-                                        "Create Article"
+                                        "Buat Artikel"
                                     )}
                                 </Button>
                             </div>

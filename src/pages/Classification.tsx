@@ -9,8 +9,6 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { Pie } from "react-chartjs-2";
 import { useClassificationHistory } from "@/hooks/use-classification-history";
 import { useAuth } from "@/hooks/use-auth"; // Add this
-import { supabase } from "@/integrations/supabase/client"; // Add this
-import { Json } from "@/integrations/supabase/types"; // Add this for type casting
 
 interface WasteType {
     name: string;
@@ -389,7 +387,9 @@ const Classification = () => {
                                         <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-3 sm:mb-4">
                                             <span className={`px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm ${getCategoryClass(waste.category)}`}>{waste.category}</span>
                                             <span className={`px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm ${waste.recyclable ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
-                                                {waste.recyclable ? "♻️ " : "🚫 "}<span className="hidden sm:inline">{waste.recyclable ? "Dapat didaur ulang" : "Tidak dapat didaur ulang"}</span><span className="sm:hidden">Daur ulang</span>
+                                                {waste.recyclable ? "♻️ " : "🚫 "}
+                                                <span className="hidden sm:inline">{waste.recyclable ? "Dapat didaur ulang" : "Tidak dapat didaur ulang"}</span>
+                                                <span className="sm:hidden">Daur ulang</span>
                                             </span>
                                             <span className="px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm bg-gray-100 text-gray-800">📊 {waste.percentage}%</span>
                                         </div>

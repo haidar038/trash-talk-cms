@@ -135,7 +135,7 @@ const Footer = () => {
                     {/* Social Links */}
                     <div className="flex items-center gap-2">
                         {socialLinks.map((social, index) => (
-                            <Button key={index} variant="ghost" size="icon" className="h-9 w-9 hover:text-primary" onClick={() => window.open(social.url, "_blank")} aria-label={social.label}>
+                            <Button key={index} variant="ghost" size="icon" className="h-9 w-9 hover:text-accent-foreground" onClick={() => window.open(social.url, "_blank")} aria-label={social.label}>
                                 {social.icon}
                             </Button>
                         ))}
