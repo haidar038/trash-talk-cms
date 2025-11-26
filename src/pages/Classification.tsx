@@ -43,16 +43,16 @@ const Classification = () => {
     const [isFlashlightSupported, setIsFlashlightSupported] = useState(false);
     const videoRef = useRef<HTMLVideoElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const user = useAuth().user;
+    const { user, loading: authLoading } = useAuth();
     const { saveClassification } = useClassificationHistory(user?.id);
 
     // Redirect to auth if not logged in
     useEffect(() => {
-        if (!user) {
+        if (!authLoading && !user) {
             toast.error("Silakan login terlebih dahulu untuk menggunakan fitur klasifikasi");
             navigate("/auth");
         }
-    }, [user, navigate]);
+    }, [user, authLoading, navigate]);
 
     // Cleanup camera stream on unmount
     useEffect(() => {
