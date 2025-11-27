@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "lib": ["deno.window"],
+    "strict": false,
+    "noImplicitAny": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false
+  },
+  "lint": {
+    "rules": {
+      "exclude": ["no-unused-vars"]
+    }
+  },
+  "fmt": {
+    "useTabs": false,
+    "lineWidth": 200,
+    "indentWidth": 4,
+    "semiColons": true,
+    "singleQuote": false,
+    "proseWrap": "preserve"
+  }
+}

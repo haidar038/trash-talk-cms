@@ -8,7 +8,8 @@ import { toast } from "sonner";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { Pie } from "react-chartjs-2";
 import { useClassificationHistory } from "@/hooks/use-classification-history";
-import { useAuth } from "@/hooks/use-auth"; // Add this
+import { useAuth } from "@/hooks/use-auth";
+import { supabase } from "@/integrations/supabase/client";
 
 interface WasteType {
     name: string;
@@ -41,6 +42,7 @@ const Classification = () => {
     const [isCameraActive, setIsCameraActive] = useState(false);
     const [isFlashlightOn, setIsFlashlightOn] = useState(false);
     const [isFlashlightSupported, setIsFlashlightSupported] = useState(false);
+    const [isDragging, setIsDragging] = useState(false);
     const videoRef = useRef<HTMLVideoElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const { user, loading: authLoading } = useAuth();
@@ -125,17 +127,37 @@ const Classification = () => {
     const captureImage = () => {
         if (videoRef.current && videoRef.current.readyState === videoRef.current.HAVE_ENOUGH_DATA) {
             const canvas = document.createElement("canvas");
-            canvas.width = videoRef.current.videoWidth;
-            canvas.height = videoRef.current.videoHeight;
+            const MAX_WIDTH = 1024;
+            const MAX_HEIGHT = 1024;
+            let width = videoRef.current.videoWidth;
+            let height = videoRef.current.videoHeight;
+
+            // Resize if needed
+            if (width > height) {
+                if (width > MAX_WIDTH) {
+                    height *= MAX_WIDTH / width;
+                    width = MAX_WIDTH;
+                }
+            } else {
+                if (height > MAX_HEIGHT) {
+                    width *= MAX_HEIGHT / height;
+                    height = MAX_HEIGHT;
+                }
+            }
+
+            canvas.width = width;
+            canvas.height = height;
             const context = canvas.getContext("2d");
             if (context) {
-                context.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
-                const dataUrl = canvas.toDataURL("image/png");
+                context.drawImage(videoRef.current, 0, 0, width, height);
+                // Use JPEG with 80% quality for smaller file size
+                const dataUrl = canvas.toDataURL("image/jpeg", 0.8);
                 setImageDataUrl(dataUrl);
+                console.log("Captured image size:", Math.round(dataUrl.length / 1024), "KB");
                 fetch(dataUrl)
                     .then((res) => res.blob())
                     .then((blob) => {
-                        const file = new File([blob], "capture.png", { type: "image/png" });
+                        const file = new File([blob], "capture.jpg", { type: "image/jpeg" });
                         setSelectedFile(file);
                     });
                 stopCamera();
@@ -144,7 +166,48 @@ const Classification = () => {
         }
     };
 
-    const handleFile = (file: File) => {
+    const compressImage = (file: File): Promise<string> => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement("canvas");
+                    const MAX_WIDTH = 1024;
+                    const MAX_HEIGHT = 1024;
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > height) {
+                        if (width > MAX_WIDTH) {
+                            height *= MAX_WIDTH / width;
+                            width = MAX_WIDTH;
+                        }
+                    } else {
+                        if (height > MAX_HEIGHT) {
+                            width *= MAX_HEIGHT / height;
+                            height = MAX_HEIGHT;
+                        }
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext("2d");
+                    ctx?.drawImage(img, 0, 0, width, height);
+
+                    // Compress to JPEG with 80% quality
+                    const compressedDataUrl = canvas.toDataURL("image/jpeg", 0.8);
+                    resolve(compressedDataUrl);
+                };
+                img.onerror = reject;
+                img.src = e.target?.result as string;
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+    };
+
+    const handleFile = async (file: File) => {
         if (!file) return;
 
         if (!file.type.startsWith("image/")) {
@@ -156,20 +219,39 @@ const Classification = () => {
         setResults(null);
         setSelectedFile(file);
 
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            setImageDataUrl(e.target?.result as string);
-        };
-        reader.onerror = () => {
-            setError("Gagal membaca file. Silakan coba lagi.");
-            toast.error("Gagal membaca file");
-        };
-        reader.readAsDataURL(file);
+        try {
+            const compressedImage = await compressImage(file);
+            setImageDataUrl(compressedImage);
+            console.log("Image compressed. Size:", Math.round(compressedImage.length / 1024), "KB");
+        } catch (err) {
+            console.error("Compression error:", err);
+            setError("Gagal memproses gambar. Silakan coba lagi.");
+            toast.error("Gagal memproses gambar");
+        }
+    };
+
+    const onDragEnter = (e: React.DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsDragging(true);
+    };
+
+    const onDragLeave = (e: React.DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsDragging(false);
+    };
+
+    const onDragOver = (e: React.DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
     };
 
     const onDrop = (e: React.DragEvent) => {
         e.preventDefault();
         e.stopPropagation();
+        setIsDragging(false);
+
         const file = e.dataTransfer?.files?.[0];
         if (file && file.type.startsWith("image/")) {
             handleFile(file);
@@ -185,78 +267,64 @@ const Classification = () => {
         setResults(null);
 
         try {
-            const prompt = `Analisa gambar ini dan identifikasi jenis sampah yang terlihat.
-                            Berikan respons dalam format JSON dengan struktur berikut:
-                            {
-                            "waste_types": [
-                                {
-                                "name": "nama jenis sampah",
-                                "category": "organik/anorganik/B3/elektronik",
-                                "percentage": estimasi persentase komposisi (angka saja),
-                                "recyclable": true/false,
-                                "decomposition_time": "waktu penguraian estimasi",
-                                "materials": [
-                                    {
-                                    "type": "jenis material (contoh: plastik, kertas, metal, kaca, organik, tekstil)",
-                                    "percentage": estimasi persentase material (angka saja)
-                                    }
-                                ]
-                                }
-                            ],
-                            "overall_assessment": "penilaian keseluruhan kondisi sampah",
-                            "disposal_recommendations": ["rekomendasi pengelolaan 1", "rekomendasi 2", "rekomendasi 3"],
-                            "environmental_impact": "dampak lingkungan jika tidak dikelola dengan baik"
-                            }
+            // Get current session
+            const {
+                data: { session },
+            } = await supabase.auth.getSession();
 
-                            PENTING:
-                            - Jika tidak ada sampah yang terdeteksi dalam gambar, return: {"error": "Tidak terdeteksi sampah dalam gambar", "waste_types": []}
-                            - Respons HARUS dalam format JSON yang valid
-                            - Jangan tambahkan teks apapun di luar JSON
-                            - Persentase harus total 100% untuk semua waste_types
-                            - Persentase materials dalam setiap waste_type harus total 100%
-                            - Bedakan jenis sampah dan nama sampah, dimana jenis adalah kategori umum (organik, anorganik, B3, elektronik) dan nama adalah identifikasi spesifik (misal: botol plastik, kertas koran, baterai, dll)
-                            - Sertakan alasan mengapa sampah tersebut dapat atau tidak dapat didaur ulang dalam properti "recycle_reason". Paragraf harus ringkas`;
-
-            if (!window.puter?.ai) {
-                throw new Error("Puter.js tidak tersedia. Pastikan script sudah dimuat.");
+            if (!session) {
+                throw new Error("Anda harus login terlebih dahulu");
             }
 
-            const response = await window.puter.ai.chat(prompt, imageDataUrl, { model: "gpt-5-nano" });
-            let resultText = response;
-            if (response?.message?.content) resultText = response.message.content;
-            else if (response?.content) resultText = response.content;
+            console.log("Sending image to Edge Function...");
+            console.log("Image size:", Math.round(imageDataUrl.length / 1024), "KB");
 
-            if (typeof resultText === "string") {
-                if (resultText.includes("```json")) {
-                    resultText = resultText.split("```json")[1].split("```")[0].trim();
-                } else if (resultText.includes("```")) {
-                    resultText = resultText.split("```")[1].split("```")[0].trim();
-                }
+            // Call Supabase Edge Function with timeout (90 seconds)
+            const timeoutPromise = new Promise((_, reject) => {
+                setTimeout(() => reject(new Error("Request timeout - Proses terlalu lama. Coba dengan gambar yang lebih kecil.")), 90000);
+            });
+
+            const functionPromise = supabase.functions.invoke("classify-waste", {
+                body: { imageDataUrl },
+                headers: {
+                    Authorization: `Bearer ${session.access_token}`,
+                },
+            });
+
+            const { data, error: functionError } = (await Promise.race([functionPromise, timeoutPromise])) as any;
+
+            if (functionError) {
+                console.error("Function Error Details:", {
+                    message: functionError.message,
+                    context: functionError.context,
+                    details: data,
+                });
+                throw new Error(data?.error || functionError.message || "Edge Function error");
             }
 
-            const data: AnalysisResult = typeof resultText === "string" ? JSON.parse(resultText) : resultText;
-            setResults(data);
+            const result: AnalysisResult = data;
+            setResults(result);
 
-            if (data.error) {
-                setError(data.error);
-                toast.error(data.error);
+            if (result.error) {
+                setError(result.error);
+                toast.error(result.error);
             } else {
                 toast.success("Analisis berhasil!");
 
-                // Save to history - ADD THIS
+                // Save to history
                 if (user?.id) {
-                    const avgPercentage = data.waste_types.reduce((sum, w) => sum + w.percentage, 0) / data.waste_types.length;
+                    const avgPercentage = result.waste_types.reduce((sum, w) => sum + w.percentage, 0) / result.waste_types.length;
 
                     saveClassification.mutate({
                         user_id: user.id,
                         image_url: imageDataUrl,
-                        result: data,
+                        result: result,
                         accuracy: avgPercentage / 100, // Convert percentage to 0-1 range
                     });
                 }
             }
         } catch (err: any) {
-            console.error(err);
+            console.error("Classification Error:", err);
             const errorMsg = "Error menganalisis gambar: " + (err.message || err);
             setError(errorMsg);
             toast.error("Gagal menganalisis gambar");
@@ -285,20 +353,29 @@ const Classification = () => {
             <div className="text-center mb-6 sm:mb-7 md:mb-8">
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-3 sm:mb-4">
                     <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold">🌱 Klasifikasi Sampah dengan AI</h1>
-                    {user && (
-                        <Button variant="outline" size="sm" onClick={() => navigate("/classification/history")} className="text-xs sm:text-sm">
-                            <History className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-                            <span className="hidden sm:inline">Lihat </span>Riwayat
-                        </Button>
-                    )}
                 </div>
                 <p className="text-sm sm:text-base md:text-lg lg:text-xl text-muted-foreground mb-2 sm:mb-3 px-4">Unggah gambar limbah untuk identifikasi otomatis menggunakan kecerdasan buatan (AI).</p>
-                <span className="inline-block bg-primary/10 text-primary text-xs sm:text-sm px-2 sm:px-3 py-1 rounded-full">⚡ Powered by Puter.js + OpenAI GPT-5-Nano</span>
+                <span className="inline-block bg-primary/10 text-primary text-xs sm:text-sm px-2 sm:px-3 py-1 rounded-full">⚡ Powered by Groq (Llama 4 Scout)</span>
             </div>
+
+            {user && (
+                <Button variant="outline" size="sm" onClick={() => navigate("/classification/history")} className="text-xs sm:text-sm mb-3">
+                    <History className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-1" />
+                    <span className="hidden sm:inline">Lihat </span>Riwayat
+                </Button>
+            )}
 
             <Card className="mb-6 sm:mb-7 md:mb-8">
                 <CardContent className="pt-4 sm:pt-5 md:pt-6">
-                    <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-4 sm:p-6 md:p-8 text-center hover:border-primary/50 transition-colors" onDragOver={(e) => e.preventDefault()} onDrop={onDrop}>
+                    <div
+                        className={`border-2 border-dashed rounded-lg p-4 sm:p-6 md:p-8 text-center transition-all duration-200 ${
+                            isDragging ? "border-primary bg-primary/5 scale-[1.02]" : "border-muted-foreground/25 hover:border-primary/50"
+                        }`}
+                        onDragEnter={onDragEnter}
+                        onDragLeave={onDragLeave}
+                        onDragOver={onDragOver}
+                        onDrop={onDrop}
+                    >
                         {imageDataUrl ? (
                             <div className="space-y-3 sm:space-y-4">
                                 <img src={imageDataUrl} alt="Preview" className="max-h-48 sm:max-h-56 md:max-h-64 lg:max-h-80 mx-auto rounded-lg shadow-md" />
@@ -354,7 +431,9 @@ const Classification = () => {
                                         Buka Kamera
                                     </Button>
                                 </div>
-                                <p className="text-xs sm:text-sm text-muted-foreground">Atau seret & lepas gambar di sini</p>
+                                <p className={`text-xs sm:text-sm transition-colors ${isDragging ? "text-primary font-semibold" : "text-muted-foreground"}`}>
+                                    {isDragging ? "📂 Lepaskan gambar di sini" : "Atau seret & lepas gambar di sini"}
+                                </p>
                             </div>
                         )}
                         <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={(e) => e.target.files && handleFile(e.target.files[0])} />

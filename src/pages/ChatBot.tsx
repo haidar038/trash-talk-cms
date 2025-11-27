@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
-import { Loader2, Send, Bot, User, Trash2, MessageSquare, HelpCircle } from "lucide-react";
+import { Loader2, Send, Bot, User, Trash2, MessageSquare, HelpCircle, Recycle, Leaf, Cpu, Trash, Globe, ShoppingBag } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useNavigate } from "react-router-dom";
 import { GoogleGenerativeAI } from "@google/generative-ai";
@@ -22,12 +22,12 @@ interface Message {
 }
 
 const FREQUENTLY_ASKED_QUESTIONS = [
-    "Apa saja jenis sampah yang bisa didaur ulang?",
-    "Bagaimana cara memulai kompos di rumah?",
-    "Apa itu sampah elektronik (e-waste)?",
-    "Bagaimana cara memilah sampah dengan benar?",
-    "Apa manfaat daur ulang bagi lingkungan?",
-    "Bagaimana cara mengurangi sampah plastik?",
+    { question: "Apa saja jenis sampah yang bisa didaur ulang?", icon: Recycle },
+    { question: "Bagaimana cara memulai kompos di rumah?", icon: Leaf },
+    { question: "Apa itu sampah elektronik (e-waste)?", icon: Cpu },
+    { question: "Bagaimana cara memilah sampah dengan benar?", icon: Trash },
+    { question: "Apa manfaat daur ulang bagi lingkungan?", icon: Globe },
+    { question: "Bagaimana cara mengurangi sampah plastik?", icon: ShoppingBag },
 ];
 
 const ChatBot = () => {
@@ -210,26 +210,31 @@ Selalu merespons dengan cara yang membantu, edukatif, dan fokus pada pengelolaan
         <div className="min-h-screen bg-gradient-to-br from-background via-secondary/30 to-accent/20">
             <div className="container mx-auto px-4 sm:px-6 md:px-8 py-6 sm:py-8 md:py-10">
                 <div className="max-w-2xl md:max-w-3xl lg:max-w-4xl mx-auto">
-                    <div className="mb-4 sm:mb-5 md:mb-6 flex items-center justify-between">
-                        <div>
+                    <div className="mb-4 sm:mb-5 md:mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+                        <div className="flex-1">
                             <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-1 sm:mb-2 flex items-center gap-2 sm:gap-3">
-                                <Bot className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-primary" />
-                                SapuLidi Assistant
+                                <div className="p-2 sm:p-2.5 md:p-3 rounded-xl bg-gradient-to-br from-primary to-primary/70 shadow-lg">
+                                    <Bot className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-white" />
+                                </div>
+                                <span className="bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">SapuLidi Assistant</span>
                             </h1>
-                            <p className="text-muted-foreground text-xs sm:text-sm md:text-base">Tanyakan apapun tentang pengelolaan sampah dan keberlanjutan lingkungan</p>
+                            <p className="text-muted-foreground text-xs sm:text-sm md:text-base pl-9 sm:pl-11 md:pl-14">Tanyakan apapun tentang pengelolaan sampah dan keberlanjutan lingkungan</p>
                         </div>
                         {messages.length > 0 && (
-                            <Button variant="outline" size="sm" onClick={handleClearHistory} className="text-xs sm:text-sm">
+                            <Button variant="outline" size="sm" onClick={handleClearHistory} className="text-xs sm:text-sm border-2 hover:bg-destructive/10 hover:text-destructive hover:border-destructive transition-colors w-full sm:w-auto">
                                 <Trash2 className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-                                <span className="hidden sm:inline">Hapus</span>
+                                <span className="sm:hidden">Hapus Riwayat</span>
+                                <span className="hidden sm:inline">Hapus Riwayat</span>
                             </Button>
                         )}
                     </div>
 
-                    <Card className="shadow-xl">
-                        <CardHeader className="p-3 sm:p-4 md:p-5 border-b">
-                            <CardTitle className="text-sm sm:text-base md:text-lg flex items-center gap-1.5 sm:gap-2">
-                                <MessageSquare className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5" />
+                    <Card className="shadow-xl border-2">
+                        <CardHeader className="p-3 sm:p-4 md:p-5 border-b bg-gradient-to-r from-primary/5 to-accent/5">
+                            <CardTitle className="text-sm sm:text-base md:text-lg flex items-center gap-2">
+                                <div className="p-1.5 sm:p-2 rounded-lg bg-primary/10">
+                                    <MessageSquare className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 text-primary" />
+                                </div>
                                 Percakapan
                             </CardTitle>
                         </CardHeader>
@@ -241,40 +246,56 @@ Selalu merespons dengan cara yang membantu, edukatif, dan fokus pada pengelolaan
                                         {/* Initial AI Greeting */}
                                         <div className="flex gap-2 sm:gap-3 justify-start">
                                             <div className="flex-shrink-0">
-                                                <div className="w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 rounded-full bg-primary/10 flex items-center justify-center">
-                                                    <Bot className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 text-primary" />
+                                                <div className="w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 rounded-full bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-md">
+                                                    <Bot className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 text-white" />
                                                 </div>
                                             </div>
-                                            <div className="bg-muted rounded-lg px-3 py-2 sm:px-4 sm:py-2.5 max-w-[85%]">
-                                                <p className="text-xs sm:text-sm md:text-base">
-                                                    Halo! 👋 Saya <strong>SapuLidi Assistant</strong>, asisten virtual yang siap membantu Anda memahami lebih dalam tentang pengelolaan sampah dan keberlanjutan lingkungan.
+                                            <div className="bg-gradient-to-br from-muted to-muted/70 rounded-2xl rounded-tl-sm px-3 py-2.5 sm:px-4 sm:py-3 md:px-5 md:py-3.5 max-w-[85%] shadow-sm border">
+                                                <p className="text-xs sm:text-sm md:text-base leading-relaxed">
+                                                    Halo! 👋 Saya <strong className="text-primary">SapuLidi Assistant</strong>, asisten virtual yang siap membantu Anda memahami lebih dalam tentang pengelolaan sampah dan keberlanjutan lingkungan.
                                                 </p>
-                                                <p className="text-xs sm:text-sm md:text-base mt-2">Saya bisa menjawab pertanyaan seputar daur ulang, kompos, pengurangan sampah, dan berbagai topik pengelolaan limbah lainnya.</p>
-                                                <p className="text-xs sm:text-sm md:text-base mt-2 font-medium">Silakan pilih pertanyaan di bawah ini atau ketik pertanyaan Anda sendiri! 💬</p>
+                                                <p className="text-xs sm:text-sm md:text-base mt-2 sm:mt-2.5 leading-relaxed">Saya bisa menjawab pertanyaan seputar daur ulang ♻️, kompos 🌱, pengurangan sampah, dan berbagai topik pengelolaan limbah lainnya.</p>
+                                                <p className="text-xs sm:text-sm md:text-base mt-2 sm:mt-2.5 font-medium text-primary">Silakan pilih pertanyaan di bawah ini atau ketik pertanyaan Anda sendiri! 💬</p>
                                             </div>
                                         </div>
 
                                         {/* Frequently Asked Questions Card */}
-                                        <Card className="border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5">
-                                            <CardHeader className="p-3 sm:p-4">
-                                                <CardTitle className="text-xs sm:text-sm md:text-base flex items-center gap-1.5 sm:gap-2">
-                                                    <HelpCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                                        <Card className="border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5 shadow-lg">
+                                            <CardHeader className="p-3 sm:p-4 md:p-5 space-y-1">
+                                                <CardTitle className="text-sm sm:text-base md:text-lg flex items-center gap-2">
+                                                    <div className="p-1.5 sm:p-2 rounded-lg bg-primary/10">
+                                                        <HelpCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 text-primary" />
+                                                    </div>
                                                     Pertanyaan yang Sering Diajukan
                                                 </CardTitle>
+                                                <p className="text-[10px] sm:text-xs text-muted-foreground pl-8 sm:pl-10">
+                                                    Pilih salah satu pertanyaan di bawah untuk memulai percakapan
+                                                </p>
                                             </CardHeader>
-                                            <CardContent className="p-3 sm:p-4 pt-0 space-y-2">
-                                                {FREQUENTLY_ASKED_QUESTIONS.map((question, index) => (
-                                                    <Button
-                                                        key={index}
-                                                        variant="outline"
-                                                        size="sm"
-                                                        onClick={() => handleFAQClick(question)}
-                                                        disabled={isLoading}
-                                                        className="w-full justify-start text-left h-auto py-2 sm:py-2.5 px-3 sm:px-4 text-xs sm:text-sm hover:bg-primary/10 hover:text-primary hover:border-primary/50 transition-colors"
-                                                    >
-                                                        <span className="line-clamp-2">{question}</span>
-                                                    </Button>
-                                                ))}
+                                            <CardContent className="p-3 sm:p-4 md:p-5 pt-0">
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-2.5 md:gap-3">
+                                                    {FREQUENTLY_ASKED_QUESTIONS.map((faq, index) => {
+                                                        const Icon = faq.icon;
+                                                        return (
+                                                            <Button
+                                                                key={index}
+                                                                variant="outline"
+                                                                onClick={() => handleFAQClick(faq.question)}
+                                                                disabled={isLoading}
+                                                                className="w-full justify-start text-left h-auto py-2.5 sm:py-3 md:py-3.5 px-3 sm:px-3.5 md:px-4 text-xs sm:text-sm group hover:bg-primary/10 hover:text-primary hover:border-primary transition-all duration-200 hover:shadow-md"
+                                                            >
+                                                                <div className="flex items-start gap-2 sm:gap-2.5 w-full">
+                                                                    <div className="flex-shrink-0 mt-0.5">
+                                                                        <div className="p-1.5 sm:p-2 rounded-md bg-primary/5 group-hover:bg-primary/15 transition-colors">
+                                                                            <Icon className="w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 text-primary" />
+                                                                        </div>
+                                                                    </div>
+                                                                    <span className="flex-1 line-clamp-2 leading-snug">{faq.question}</span>
+                                                                </div>
+                                                            </Button>
+                                                        );
+                                                    })}
+                                                </div>
                                             </CardContent>
                                         </Card>
                                     </div>
@@ -284,16 +305,22 @@ Selalu merespons dengan cara yang membantu, edukatif, dan fokus pada pengelolaan
                                             <div key={msg.id} className={`flex gap-2 sm:gap-3 ${msg.isUser ? "justify-end" : "justify-start"}`}>
                                                 {!msg.isUser && (
                                                     <div className="flex-shrink-0">
-                                                        <div className="w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 rounded-full bg-primary/10 flex items-center justify-center">
-                                                            <Bot className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 text-primary" />
+                                                        <div className="w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 rounded-full bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-md">
+                                                            <Bot className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 text-white" />
                                                         </div>
                                                     </div>
                                                 )}
-                                                <div className={`max-w-[75%] sm:max-w-[80%] md:max-w-[85%] rounded-lg px-3 py-2 sm:px-4 sm:py-2.5 ${msg.isUser ? "bg-primary text-primary-foreground" : "bg-muted"}`}>
+                                                <div
+                                                    className={`max-w-[75%] sm:max-w-[80%] md:max-w-[85%] px-3 py-2 sm:px-4 sm:py-2.5 md:px-5 md:py-3 shadow-sm border ${
+                                                        msg.isUser
+                                                            ? "bg-gradient-to-br from-primary to-primary/90 text-primary-foreground rounded-2xl rounded-tr-sm"
+                                                            : "bg-gradient-to-br from-muted to-muted/70 rounded-2xl rounded-tl-sm"
+                                                    }`}
+                                                >
                                                     {msg.isUser ? (
-                                                        <p className="text-xs sm:text-sm md:text-base whitespace-pre-wrap break-words">{msg.text}</p>
+                                                        <p className="text-xs sm:text-sm md:text-base whitespace-pre-wrap break-words leading-relaxed">{msg.text}</p>
                                                     ) : (
-                                                        <div className="text-xs sm:text-sm md:text-base chatbot-markdown">
+                                                        <div className="text-xs sm:text-sm md:text-base chatbot-markdown leading-relaxed">
                                                             <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
                                                                 {msg.text}
                                                             </ReactMarkdown>
@@ -302,7 +329,7 @@ Selalu merespons dengan cara yang membantu, edukatif, dan fokus pada pengelolaan
                                                 </div>
                                                 {msg.isUser && (
                                                     <div className="flex-shrink-0">
-                                                        <div className="w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 rounded-full bg-primary flex items-center justify-center">
+                                                        <div className="w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 rounded-full bg-gradient-to-br from-primary to-primary/90 flex items-center justify-center shadow-md">
                                                             <User className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 text-primary-foreground" />
                                                         </div>
                                                     </div>
@@ -312,12 +339,13 @@ Selalu merespons dengan cara yang membantu, edukatif, dan fokus pada pengelolaan
                                         {isLoading && (
                                             <div className="flex gap-2 sm:gap-3 justify-start">
                                                 <div className="flex-shrink-0">
-                                                    <div className="w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 rounded-full bg-primary/10 flex items-center justify-center">
-                                                        <Bot className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 text-primary" />
+                                                    <div className="w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 rounded-full bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-md animate-pulse">
+                                                        <Bot className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 text-white" />
                                                     </div>
                                                 </div>
-                                                <div className="bg-muted rounded-lg px-3 py-2 sm:px-4 sm:py-2.5">
-                                                    <Loader2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 animate-spin" />
+                                                <div className="bg-gradient-to-br from-muted to-muted/70 rounded-2xl rounded-tl-sm px-4 py-3 sm:px-5 sm:py-3.5 shadow-sm border flex items-center gap-2">
+                                                    <Loader2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 animate-spin text-primary" />
+                                                    <span className="text-xs sm:text-sm text-muted-foreground">Sedang mengetik...</span>
                                                 </div>
                                             </div>
                                         )}
@@ -327,10 +355,21 @@ Selalu merespons dengan cara yang membantu, edukatif, dan fokus pada pengelolaan
                             </ScrollArea>
 
                             {/* Input Area */}
-                            <div className="border-t p-3 sm:p-4 md:p-5">
+                            <div className="border-t bg-gradient-to-r from-primary/5 to-accent/5 p-3 sm:p-4 md:p-5">
                                 <form onSubmit={handleSendMessage} className="flex gap-2 sm:gap-3">
-                                    <Input placeholder="Tanyakan tentang pengelolaan sampah..." value={input} onChange={(e) => setInput(e.target.value)} disabled={isLoading} className="flex-1 text-xs sm:text-sm md:text-base" />
-                                    <Button type="submit" disabled={isLoading} size="sm" className="flex-shrink-0">
+                                    <Input
+                                        placeholder="Tanyakan tentang pengelolaan sampah..."
+                                        value={input}
+                                        onChange={(e) => setInput(e.target.value)}
+                                        disabled={isLoading}
+                                        className="flex-1 text-xs sm:text-sm md:text-base border-2 focus-visible:ring-primary/20 bg-background/50"
+                                    />
+                                    <Button
+                                        type="submit"
+                                        disabled={isLoading || !input.trim()}
+                                        size="sm"
+                                        className="flex-shrink-0 px-3 sm:px-4 md:px-5 shadow-md hover:shadow-lg transition-shadow"
+                                    >
                                         {isLoading ? (
                                             <Loader2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 animate-spin" />
                                         ) : (
